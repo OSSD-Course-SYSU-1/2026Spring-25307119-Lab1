@@ -1,0 +1,84 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "AdsKitDemo"
+    },
+    {
+      "name": "ads_demo_title",
+      "value": "AdsKitDemo"
+    },
+    {
+      "name": "request_reward_ad_btn",
+      "value": "request reward ad"
+    },
+    {
+      "name": "request_native_video_ad_btn",
+      "value": "request native video ad"
+    },
+    {
+      "name": "request_native_big_image_ad_btn",
+      "value": "request native big image ad"
+    },
+    {
+      "name": "request_native_small_image_ad_btn",
+      "value": "request native small image ad"
+    },
+    {
+      "name": "request_native_three_image_ad_btn",
+      "value": "request native three image ad"
+    },
+    {
+      "name": "request_splash_video_ad_btn",
+      "value": "request splash video ad"
+    },
+    {
+      "name": "request_splash_image_ad_btn",
+      "value": "request splash image ad"
+    },
+    {
+      "name": "request_placement_ad_btn",
+      "value": "request placement image ad"
+    },
+    {
+      "name": "request_interstitial_video_ad_btn",
+      "value": "request interstitial video ad"
+    },
+    {
+      "name": "request_interstitial_image_ad_btn",
+      "value": "request interstitial image ad"
+    },
+    {
+      "name": "request_banner_ad_btn",
+      "value": "request banner ad"
+    },
+    {
+      "name": "video",
+      "value": "video"
+    },
+    {
+      "name": "ads_show_page",
+      "value": "ads service show page"
+    },
+    {
+      "name": "copyright",
+      "value": "Copyright © 2011-2017 Huawei Technologies Co., Ltd."
+    },
+    {
+      "name": "app_tracking_permission_reason",
+      "value": "The app obtains this information to recommend content that you may be interested in."
+    },
+    {
+      "name": "request_native_self_render_ad_btn",
+      "value": "request native self render ad"
+    }
+  ]
+}
