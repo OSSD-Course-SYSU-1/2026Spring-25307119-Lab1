@@ -15,21 +15,21 @@
  */
 
 export enum AdType {
-  // 激励广告的类型
+  // Rewarded ad.
   REWARD_AD = 7,
 
-  // 原生广告的类型
+  // Native ad.
   NATIVE_AD = 3,
 
-  // 开屏广告的类型
+  // Splash ad.
   SPLASH_AD = 1,
 
-  // 插屏广告的类型
+  // Interstitial ad.
   INTERSTITIAL_AD = 12,
 
-  // 贴片广告的类型
+  // Roll ad.
   PLACEMENT_AD = 60,
 
-  // Banner广告的类型
-  BANNER_AD = 8,
+  // Banner ad.
+  BANNER_AD = 8
 }

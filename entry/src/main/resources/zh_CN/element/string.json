@@ -65,10 +65,6 @@
       "value": "视频"
     },
     {
-      "name": "ads_show_page",
-      "value": "流量变现服务演示页面"
-    },
-    {
       "name": "copyright",
       "value": "版权所有 © 2011-2017 华为技术有限公司"
     },
@@ -77,8 +73,8 @@
       "value": "应用获知此信息，用于向您推荐可能感兴趣的内容"
     },
     {
-      "name": "request_native_self_render_ad_btn",
-      "value": "原生媒体自渲染广告"
+      "name": "ad_free_for_VIP_members",
+      "value": "VIP免广告"
     }
   ]
 }

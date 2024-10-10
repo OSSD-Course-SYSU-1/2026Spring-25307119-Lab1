@@ -28,7 +28,7 @@ import { AdType } from '../constant/AdType';
 const TAG = 'Ads Demo-LoadAd';
 
 /**
- * 流量变现服务演示页面
+ * Demo UI of Petal Ads Publisher Service.
  */
 @Entry
 @Component
@@ -36,217 +36,203 @@ export struct LoadAd {
   private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
   private scroller: Scroller = new Scroller();
   private oaid: string = '';
-  // 广告展示参数
+  // Ad display parameters.
   private adDisplayOptions: advertising.AdDisplayOptions = {
-    // 是否静音，默认不静音
-    mute: false,
+    // Whether to mute the ad. By default, the ad is not muted.
+    mute: false
   }
-  // 广告配置
+  // Ad configuration.
   private adOptions: advertising.AdOptions = {
-    // 是否允许流量下载  0不允许 1允许，不设置以广告主设置为准
+    // Whether to allow ad asset download through mobile data. 0: no; 1: yes. If this parameter is not set, the advertiser's setting will be used.
     allowMobileTraffic: 0,
-    // 是否希望根据 COPPA 的规定将您的内容视为面向儿童的内容，: -1默认值，不确定 0不希望 1希望
+    // Whether you want your ad content to be treated as child-directed according to the regulations of COPPA. -1 (default value): uncertain; 0: no; 1: yes.
     tagForChildProtection: -1,
-    // 是否希望按适合未达到法定承诺年龄的欧洲经济区 (EEA) 用户的方式处理该广告请求 -1默认值，不确定 0不希望 1希望
+    // Whether you want the ad request to be processed in a way that is suitable for users in the European Economic Area (EEA) who are below the legal age of consent. -1 (default value): uncertain; 0: no; 1: yes.
     tagForUnderAgeOfPromise: -1,
-    // 设置广告内容分级上限: W: 3+,所有受众 PI: 7+,家长指导 J:12+,青少年 A: 16+/18+，成人受众
-    adContentClassification: 'A',
+    // Maximum ad content rating. W: aged 3 and up; PI: aged 7 and up, under parental guidance; J: teenagers aged 12 and up; A: adults aged 16 or 18 and up.
+    adContentClassification: 'A'
   }
-  // 贴片广告配置
+  // Roll ad configuration.
   private adOptionsPlacementAd: advertising.AdOptions = {
+    // Set the roll ad display duration.
     totalDuration: 30,
-    placementAdCountDownDesc: encodeURI('VIP免广告'),
-    // 是否允许流量下载  0不允许 1允许，不设置以广告主设置为准
-	  allowMobileTraffic: 0,
-    // 是否希望根据 COPPA 的规定将您的内容视为面向儿童的内容，: -1默认值，不确定 0不希望 1希望
+    // Set the roll ad countdown text.
+    placementAdCountDownDesc: encodeURI(this.context.resourceManager.getStringSync($r('app.string.ad_free_for_VIP_members')
+      .id)),
+    // Whether to allow ad asset download through mobile data. 0: no; 1: yes. If this parameter is not set, the advertiser's setting will be used.
+    allowMobileTraffic: 0,
+    // Whether you want your ad content to be treated as child-directed according to the regulations of COPPA. -1 (default value): uncertain; 0: no; 1: yes.
     tagForChildProtection: -1,
-    // 是否希望按适合未达到法定承诺年龄的欧洲经济区 (EEA) 用户的方式处理该广告请求 -1默认值，不确定 0不希望 1希望
+    // Whether you want the ad request to be processed in a way that is suitable for users in the European Economic Area (EEA) who are below the legal age of consent. -1 (default value): uncertain; 0: no; 1: yes.
     tagForUnderAgeOfPromise: -1,
-    // 设置广告内容分级上限: W: 3+,所有受众 PI: 7+,家长指导 J:12+,青少年 A: 16+/18+，成人受众
-    adContentClassification: 'A',
+    // Maximum ad content rating. W: aged 3 and up; PI: aged 7 and up, under parental guidance; J: teenagers aged 12 and up; A: adults aged 16 or 18 and up.
+    adContentClassification: 'A'
   }
-  // 激励广告请求参数
+  // Rewarded ad request parameters.
   private rewardAdReqParams: advertising.AdRequestParams = {
     adId: 'testx9dtjwj8hp',
     adType: AdType.REWARD_AD,
-    adCount: 1,
+    adCount: 1
   }
-  // 原生视频广告请求参数
+  // Native video ad request parameters.
   private nativeVideoAdReqParams: advertising.AdRequestParams = {
     adId: 'testy63txaom86',
     adType: AdType.NATIVE_AD,
     adCount: 1,
-    // 原生广告自定义扩展参数。等所有广告素材下载完后再回调
-    enableDirectReturnVideoAd: true,
+    // Custom parameters of native ads. A callback is triggered after all ad assets are downloaded.
+    enableDirectReturnVideoAd: true
   }
-  // 原生大图广告请求参数
+  // Native large-image ad request parameters.
   private nativeBigImageAdReqParams: advertising.AdRequestParams = {
     adId: 'testu7m3hc4gvm',
     adType: AdType.NATIVE_AD,
     adCount: 1,
-    // 原生广告自定义扩展参数。等所有广告素材下载完后再回调
-    enableDirectReturnVideoAd: true,
+    // Custom parameters of native ads. A callback is triggered after all ad assets are downloaded.
+    enableDirectReturnVideoAd: true
   }
-  // 原生三图广告请求参数
+  // Native three-image ad request parameters.
   private nativeThreeImageAdReqParams: advertising.AdRequestParams = {
     adId: 'testr6w14o0hqz',
     adType: AdType.NATIVE_AD,
     adCount: 1,
-    // 原生广告自定义扩展参数。等所有广告素材下载完后再回调
-    enableDirectReturnVideoAd: true,
+    // Custom parameters of native ads. A callback is triggered after all ad assets are downloaded.
+    enableDirectReturnVideoAd: true
   }
-  // 原生小图广告请求参数
+  // Native small-image ad request parameters.
   private nativeSmallImageAdReqParams: advertising.AdRequestParams = {
     adId: 'testb65czjivt9',
     adType: AdType.NATIVE_AD,
     adCount: 1,
-    // 原生广告自定义扩展参数。等所有广告素材下载完后再回调
-    enableDirectReturnVideoAd: true,
+    // Custom parameters of native ads. A callback is triggered after all ad assets are downloaded.
+    enableDirectReturnVideoAd: true
   }
-  // 原生媒体自渲染广告请求参数
-  private nativeSelfRenderAdReqParams: advertising.AdRequestParams = {
-    adId: 'testy63txaom86',
-    adType: AdType.NATIVE_AD,
-    adCount: 1,
-    // 原生广告自定义扩展参数。等所有广告素材下载完后再回调
-    enableDirectReturnVideoAd: true,
-    // 原生广告自定义扩展参数。返回原生广告创意元数据给三方媒体开发者。
-    needSelfRendering: true,
-  }
-  // 开屏视频广告请求参数
+  // Splash video ad request parameters.
   private splashVideoAdReqParams: advertising.AdRequestParams = {
     adId: 'testd7c5cewoj6',
     adType: AdType.SPLASH_AD,
-    adCount: 1,
+    adCount: 1
   }
-  // 开屏图片广告请求参数
+  // Splash image ad request parameters.
   private splashImageAdReqParams: advertising.AdRequestParams = {
     adId: 'testq6zq98hecj',
     adType: AdType.SPLASH_AD,
-    adCount: 1,
+    adCount: 1
   }
-  // 贴片广告请求参数
+  // Roll ad request parameters.
   private placementAdReqParams: advertising.AdRequestParams = {
     adId: 'testy3cglm3pj0',
     adType: AdType.PLACEMENT_AD,
-    adCount: 1,
+    adCount: 1
   }
-  // 插屏视频广告请求参数
+  // Interstitial video ad request parameters.
   private interstitialVideoAdReqParams: advertising.AdRequestParams = {
     adId: 'testb4znbuh3n2',
     adType: AdType.INTERSTITIAL_AD,
-    adCount: 1,
+    adCount: 1
   }
-  // 插屏图片广告请求参数
+  // Interstitial image ad request parameters.
   private interstitialImageAdReqParams: advertising.AdRequestParams = {
     adId: 'teste9ih9j0rc3',
     adType: AdType.INTERSTITIAL_AD,
-    adCount: 1,
+    adCount: 1
   }
-  // Banner广告请求参数
+  // Banner ad request parameters.
   private bannerAdReqParams: advertising.AdRequestParams = {
     adId: 'testw6vs28auh3',
     adType: AdType.BANNER_AD,
     adCount: 1,
     adWidth: 360,
-    adHeight: 57,
+    adHeight: 57
   }
 
   aboutToAppear() {
+    HiAdLog.i(TAG, 'Start to aboutToAppear');
     try {
-      // 使用Promise回调方式获取OAID
+      // Obtain the OAID through a promise callback.
       this.requestOAIDTrackingConsentPermissions(this.context);
     } catch (error) {
-      HiAdLog.e(TAG, `catch err->${JSON.stringify(error)}`);
+      HiAdLog.e(TAG, `Catch err, code: ${error.code}, message: ${error.message}`);
     }
-    HiAdLog.i(TAG, 'aboutToAppear');
   }
 
   build() {
     Column() {
-      ActionBar({ title: $r("app.string.ads_demo_title") }).height('10%')
+      ActionBar({ title: $r('app.string.ads_demo_title') }).height('10%')
       Scroll(this.scroller) {
         Column() {
-          // 跳转到激励广告展示页面
+          // Redirect to the rewarded ad display page.
           CustomButton({
-            mText: $r("app.string.request_reward_ad_btn"), mOnClick: () => {
+            mText: $r('app.string.request_reward_ad_btn'), mOnClick: () => {
               this.requestAd(this.rewardAdReqParams, this.adOptions);
             }
           });
 
-          // 跳转到原生视频广告展示页面
+          // Redirect to the native video ad display page.
           CustomButton({
-            mText: $r("app.string.request_native_video_ad_btn"), mOnClick: () => {
+            mText: $r('app.string.request_native_video_ad_btn'), mOnClick: () => {
               this.requestAd(this.nativeVideoAdReqParams, this.adOptions);
             }
           });
 
-          // 跳转到原生大图广告展示页面
+          // Redirect to the native large-image ad display page.
           CustomButton({
-            mText: $r("app.string.request_native_big_image_ad_btn"), mOnClick: () => {
+            mText: $r('app.string.request_native_big_image_ad_btn'), mOnClick: () => {
               this.requestAd(this.nativeBigImageAdReqParams, this.adOptions);
             }
           });
 
-          // 跳转到原生小图广告展示页面
+          // Redirect to the native small-image ad display page.
           CustomButton({
-            mText: $r("app.string.request_native_small_image_ad_btn"), mOnClick: () => {
+            mText: $r('app.string.request_native_small_image_ad_btn'), mOnClick: () => {
               this.requestAd(this.nativeSmallImageAdReqParams, this.adOptions);
             }
           });
 
-          // 跳转到原生三图广告展示页面
+          // Redirect to the native three-image ad display page.
           CustomButton({
-            mText: $r("app.string.request_native_three_image_ad_btn"), mOnClick: () => {
+            mText: $r('app.string.request_native_three_image_ad_btn'), mOnClick: () => {
               this.requestAd(this.nativeThreeImageAdReqParams, this.adOptions);
             }
           });
 
-          // 跳转到原生媒体自渲染广告展示页面
+          // Redirect to the splash video ad display page.
           CustomButton({
-            mText: $r("app.string.request_native_self_render_ad_btn"), mOnClick: () => {
-              this.requestAd(this.nativeSelfRenderAdReqParams, this.adOptions);
-            }
-          });
-
-          // 跳转到开屏视频广告展示页面
-          CustomButton({
-            mText: $r("app.string.request_splash_video_ad_btn"), mOnClick: () => {
+            mText: $r('app.string.request_splash_video_ad_btn'), mOnClick: () => {
               this.requestAd(this.splashVideoAdReqParams, this.adOptions);
             }
           });
 
-          // 跳转到开屏图片广告展示页面
+          // Redirect to the splash image ad display page.
           CustomButton({
-            mText: $r("app.string.request_splash_image_ad_btn"), mOnClick: () => {
+            mText: $r('app.string.request_splash_image_ad_btn'), mOnClick: () => {
               this.requestAd(this.splashImageAdReqParams, this.adOptions);
             }
           });
 
-          // 跳转到贴片广告展示页面
+          // Redirect to the roll ad display page.
           CustomButton({
-            mText: $r("app.string.request_placement_ad_btn"), mOnClick: () => {
+            mText: $r('app.string.request_placement_ad_btn'), mOnClick: () => {
               this.requestAd(this.placementAdReqParams, this.adOptionsPlacementAd as advertising.AdOptions);
             }
           });
 
-          // 跳转到插屏视频广告展示页面
+          // Redirect to the interstitial video ad display page.
           CustomButton({
-            mText: $r("app.string.request_interstitial_video_ad_btn"), mOnClick: () => {
+            mText: $r('app.string.request_interstitial_video_ad_btn'), mOnClick: () => {
               this.requestAd(this.interstitialVideoAdReqParams, this.adOptions);
             }
           });
 
-          // 跳转到插屏图片广告展示页面
+          // Redirect to the interstitial image ad display page.
           CustomButton({
-            mText: $r("app.string.request_interstitial_image_ad_btn"), mOnClick: () => {
+            mText: $r('app.string.request_interstitial_image_ad_btn'), mOnClick: () => {
               this.requestAd(this.interstitialImageAdReqParams, this.adOptions);
             }
           });
 
-          // 跳转到Banner广告展示页面
+          // Redirect to the banner ad display page.
           CustomButton({
-            mText: $r("app.string.request_banner_ad_btn"), mOnClick: () => {
+            mText: $r('app.string.request_banner_ad_btn'), mOnClick: () => {
               routePageWithoutAds('pages/BannerAdPage', this.oaid, this.bannerAdReqParams, this.adDisplayOptions,
                 this.adOptions);
             }
@@ -261,51 +247,46 @@ export struct LoadAd {
   }
 
   private requestAd(adReqParams: advertising.AdRequestParams, adOptions: advertising.AdOptions): void {
-    // 给AdRequestParams设置oaid参数
+    // Set the oaid parameter for AdRequestParams.
     adReqParams.oaid = this.oaid;
-    // 广告请求回调监听
+    // Ad request callback listener.
     const adLoaderListener: advertising.AdLoadListener = {
-      // 广告请求失败回调
+      // Called when an ad request fails.
       onAdLoadFailure: (errorCode: number, errorMsg: string) => {
-        HiAdLog.i(TAG, `request ad errorCode is: ${errorCode}, errorMsg is: ${errorMsg}`);
+        HiAdLog.e(TAG, `Failed to request ad, errorCode is: ${errorCode}, errorMsg is: ${errorMsg}`);
         Prompt.showToast({
-          message: 'request ad failed, code is: ' + errorCode + 'message is: ' + errorMsg,
+          message: `Failed to request ad, errorCode is:  ${errorCode} , errorMsg is: ${errorMsg}`,
           duration: 1000
         });
       },
-      // 广告请求成功回调
+      // Called upon ad request success.
       onAdLoadSuccess: (ads: Array<advertising.Advertisement>) => {
-        HiAdLog.i(TAG, "succeeded in requesting ad!");
-        // 保存请求到的广告内容用于展示
-        HiAdLog.i(TAG, `ads[0].adType is : ${JSON.stringify(ads[0])}`);
-        if (canIUse("SystemCapability.Advertising.Ads")) {
+        HiAdLog.i(TAG, 'Succeeded in requesting ad!');
+        // Save the requested ad content for display.
+        HiAdLog.i(TAG, `ads[0].adType is : ${ads[0].adType}`);
+        if (canIUse('SystemCapability.Advertising.Ads')) {
           if (ads[0].adType === AdType.REWARD_AD) {
-            // 注册激励广告状态监听器，用于监听激励广告播放状态
+            // Register a status listener for rewarded ads to monitor their playback status.
             new RewardAdStatusHandler().registerPPSReceiver();
-            // 调用广告展示接口
+            // Call the API for displaying ads.
             advertising.showAd(ads[0], this.adDisplayOptions, this.context);
           } else if (ads[0].adType === AdType.NATIVE_AD) {
-            if (!ads[0].canSelfRendering) {
-              // 调用原生广告展示页面
-              routePage('pages/NativeAdPage', ads, this.adDisplayOptions);
-            } else {
-              // 调用原生广告自渲染页面
-              routePage('pages/SelfRenderAdPage', ads, this.adDisplayOptions);
-            }
+            // Call the native ad display page.
+            routePage('pages/NativeAdPage', ads, this.adDisplayOptions);
           } else if (ads[0].adType === AdType.SPLASH_AD) {
-            // 调用开屏广告展示页面
+            // Call the splash ad display page.
             if (ads[0]?.isFullScreen === true) {
               routePage('pages/SplashFullScreenAdPage', ads, this.adDisplayOptions);
             } else {
               routePage('pages/SplashHalfScreenAdPage', ads, this.adDisplayOptions);
             }
           } else if (ads[0].adType === AdType.PLACEMENT_AD) {
-            // 调用贴片广告展示页面
+            // Call the roll ad display page.
             routePage('pages/PlacementAdPage', ads, this.adDisplayOptions, this.adOptionsPlacementAd);
           } else if (ads[0].adType === AdType.INTERSTITIAL_AD) {
-            // 注册插屏广告状态监听器，用于监听插屏广告播放状态
+            // Register a status listener for interstitial ads to monitor their playback status.
             new InterstitialAdStatusHandler().registerPPSReceiver();
-            // 调用广告展示接口
+            // Call the API for displaying ads.
             advertising.showAd(ads[0], this.adDisplayOptions, this.context);
           } else {
             HiAdLog.w(TAG, 'error adType');
@@ -313,70 +294,72 @@ export struct LoadAd {
         }
       }
     };
-    // 创建AdLoader广告对象
+    // Create an AdLoader ad object.
     const load: advertising.AdLoader = new advertising.AdLoader(this.context);
-    // 调用广告请求接口
+    // Call the API for requesting ads.
     HiAdLog.i(TAG, 'request ad!');
     load.loadAd(adReqParams, adOptions, adLoaderListener);
   }
 
   private requestOAIDTrackingConsentPermissions(context: common.Context): void {
-    // 进入页面时触发动态授权弹框，向用户请求授权广告跟踪权限
+    // Request Activity tracking for this app from users when they access a page.
     const atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
     try {
-      atManager.requestPermissionsFromUser(context, ["ohos.permission.APP_TRACKING_CONSENT"]).then((data) => {
+      atManager.requestPermissionsFromUser(context, ['ohos.permission.APP_TRACKING_CONSENT']).then((data) => {
         if (data.authResults[0] == 0) {
-          HiAdLog.i(TAG, 'succeeded in requesting permission');
+          HiAdLog.i(TAG, 'Succeeded in requesting permission');
           identifier.getOAID().then((data: string) => {
             this.oaid = data;
-            HiAdLog.i(TAG, `succeeded in gettiing adsIdentifierInfo by promise`);
+            HiAdLog.i(TAG, 'Succeeded in getting adsIdentifierInfo by promise');
           }).catch((error: BusinessError) => {
-            HiAdLog.e(TAG, `getAdsIdentifierInfo failed, message: ${error.message}`);
+            HiAdLog.e(TAG, `Failed to get adsIdentifierInfo, errorCode: ${error.code}, errorMsg: ${error.message}`);
           })
         } else {
           HiAdLog.i(TAG, 'user rejected');
         }
       }).catch((err: BusinessError) => {
-        HiAdLog.e(TAG, `request permission failed, error: ${err.code} ${err.message}`);
+        HiAdLog.e(TAG, `Failed to request permission, errorCode: ${err.code}, errorMsg: ${err.message}`);
       })
     } catch (err) {
-      HiAdLog.e(TAG, `catch err->${err.code}, ${err.message}`);
+      HiAdLog.e(TAG, `catch err, errorCode: ${err.code}, errorMsg: ${err.message}`);
     }
   }
 }
 
-async function routePage(pageUri: string, ads: Array<advertising.Advertisement | null>, displayOptions: advertising.AdDisplayOptions, adOptions?: advertising.AdOptions) {
+async function routePage(pageUri: string, ads: Array<advertising.Advertisement | null>,
+  displayOptions: advertising.AdDisplayOptions, adOptions?: advertising.AdOptions) {
   let options: router.RouterOptions = {
     url: pageUri,
     params: {
       ads: ads,
       displayOptions: displayOptions,
-      adOptions: adOptions,
+      adOptions: adOptions
     }
   }
   try {
     HiAdLog.i(TAG, `routePage  + ${pageUri}`);
     router.pushUrl(options);
   } catch (error) {
-    HiAdLog.e(TAG, `routePage fail callback, code: ${error.code}, msg: ${error.message}`);
+    HiAdLog.e(TAG, `Failed to routePage callback, errorCode: ${error.code}, errorMsg: ${error.message}`);
   }
 }
 
-async function routePageWithoutAds(pageUri: string, oaid: string, adRequestParams: advertising.AdRequestParams, displayOptions: advertising.AdDisplayOptions, adOptions: advertising.AdOptions) {
-  // 给AdRequestParams设置oaid参数
+async function routePageWithoutAds(pageUri: string, oaid: string, adRequestParams: advertising.AdRequestParams,
+  displayOptions: advertising.AdDisplayOptions, adOptions: advertising.AdOptions) {
+  // Set the oaid parameter for AdRequestParams.
   adRequestParams.oaid = oaid;
   let options: router.RouterOptions = {
     url: pageUri,
     params: {
       adRequestParams: adRequestParams,
       displayOptions: displayOptions,
-      adOptions: adOptions,
+      adOptions: adOptions
     }
   }
   try {
     HiAdLog.i(TAG, `routePage  + ${pageUri}`);
     router.pushUrl(options);
   } catch (error) {
-    HiAdLog.e(TAG, `routePage fail callback, code: ${error.code}, msg: ${error.message}`);
+    HiAdLog.e(TAG, `Failed to routePage callback, errorCode: ${error.code}, errorMsg: ${error.message}`);
   }
 }

@@ -36,13 +36,11 @@ struct BannerAdPage {
   aboutToAppear() {
     HiAdLog.i(TAG, `aboutToAppear`);
     const params: Record<string, Object> = router.getParams() as Record<string, Object>;
-    if(params && params.adRequestParams as advertising.AdRequestParams && params.displayOptions as advertising.AdDisplayOptions && params.adOptions as advertising.AdOptions) {
+    if (params && params.adRequestParams as advertising.AdRequestParams &&
+      params.displayOptions as advertising.AdDisplayOptions && params.adOptions as advertising.AdOptions) {
       this.adParam = params.adRequestParams as advertising.AdRequestParams;
       this.displayOptions = params.displayOptions as advertising.AdDisplayOptions;
       this.adOptions = params.adOptions as advertising.AdOptions;
-      HiAdLog.i(TAG, `adParam: ${JSON.stringify(this.adParam)}`)
-      HiAdLog.i(TAG, `displayOptions: ${JSON.stringify(this.displayOptions)}`)
-      HiAdLog.i(TAG, `adOptions: ${JSON.stringify(this.adOptions)}`)
     } else {
       HiAdLog.i(TAG, `empty router params`);
     }

@@ -22,72 +22,74 @@ const KEY_INTERSTITIAL_STATUS = 'interstitial_ad_status';
 const TAG = 'Ads Demo-InterstitialAdStatusHandler';
 
 export class InterstitialAdStatusHandler {
-  // 用于保存创建成功的订阅者对象，后续使用其完成订阅及退订的动作
+  // Used to save the created subscriber object for subsequent subscription and unsubscription.
   private subscriber: commonEventManager.CommonEventSubscriber | null = null;
 
-  // 订阅方法，需要在每次展示广告前调用
+  // Subscription method, which must be called each time before an ad is displayed.
   public registerPPSReceiver(): void {
     if (this.subscriber) {
       this.unRegisterPPSReceiver();
     }
-    // 订阅者信息
+    // Subscriber information.
     const subscribeInfo: commonEventManager.CommonEventSubscribeInfo = {
       events: ['com.huawei.hms.pps.action.PPS_INTERSTITIAL_STATUS_CHANGED'],
-      publisherBundleName:"com.huawei.hms.adsservice",
+      publisherBundleName: 'com.huawei.hms.adsservice'
     };
-    // 创建订阅者回调
-    commonEventManager.createSubscriber(subscribeInfo, (err: BusinessError, commonEventSubscriber: commonEventManager.CommonEventSubscriber) => {
-      if (err) {
-        HiAdLog.i(TAG, `createSubscriber error, ${JSON.stringify(err)}`);
-        return;
-      }
-      HiAdLog.i(TAG, `succeeded in creating subscriber`);
-      this.subscriber = commonEventSubscriber;
-      // 订阅公共事件回调
-      if (!this.subscriber) {
-        HiAdLog.i(TAG, `need create subscriber`);
-        return;
-      }
-      commonEventManager.subscribe(this.subscriber, (err: BusinessError, commonEventData: commonEventManager.CommonEventData) => {
+    // Callback for subscriber creation.
+    commonEventManager.createSubscriber(subscribeInfo,
+      (err: BusinessError, commonEventSubscriber: commonEventManager.CommonEventSubscriber) => {
         if (err) {
-          HiAdLog.e(TAG, `subscribe error, ${JSON.stringify(err)}`);
-        } else {
-          // 订阅者成功接收到公共事件
-          HiAdLog.i(TAG, `subscribe data, ${JSON.stringify(commonEventData)}`);
-          // 获取插屏广告页面变化状态
-          const status: string = commonEventData?.parameters?.[KEY_INTERSTITIAL_STATUS];
-          switch (status) {
-            case AdStatus.AD_OPEN:
-              HiAdLog.i(TAG, `onAdOpen`);
-              break;
-            case AdStatus.AD_CLICKED:
-              HiAdLog.i(TAG, `onAdClick`);
-              break;
-            case AdStatus.AD_CLOSED:
-              HiAdLog.i(TAG, `onAdClose`);
-              this.unRegisterPPSReceiver();
-              break;
-            case AdStatus.AD_VIDEO_START:
-              HiAdLog.i(TAG, `onAdVideoStart`);
-              break;
-            case AdStatus.AD_COMPLETED:
-              HiAdLog.i(TAG, `onAdCompleted`);
-              break;
-            default:
-              break;
-          }
+          HiAdLog.e(TAG, `Failed to create subscriber, errorCode: ${err.code}, errorMsg: ${err.message}`);
+          return;
         }
+        HiAdLog.i(TAG, 'Succeeded in creating subscriber');
+        this.subscriber = commonEventSubscriber;
+        // Callback for common event subscription.
+        if (!this.subscriber) {
+          HiAdLog.i(TAG, `need create subscriber`);
+          return;
+        }
+        commonEventManager.subscribe(this.subscriber,
+          (err: BusinessError, commonEventData: commonEventManager.CommonEventData) => {
+            if (err) {
+              HiAdLog.e(TAG, `subscribe error, errorCode: ${err.code}, errorMsg: ${err.message}`);
+            } else {
+              // The subscriber receives the common event.
+              HiAdLog.i(TAG, 'subscribe data');
+              // Obtain the status change of the interstitial ad page.
+              const status: string = commonEventData?.parameters?.[KEY_INTERSTITIAL_STATUS];
+              switch (status) {
+                case AdStatus.AD_OPEN:
+                  HiAdLog.i(TAG, `onAdOpen`);
+                  break;
+                case AdStatus.AD_CLICKED:
+                  HiAdLog.i(TAG, `onAdClick`);
+                  break;
+                case AdStatus.AD_CLOSED:
+                  HiAdLog.i(TAG, `onAdClose`);
+                  this.unRegisterPPSReceiver();
+                  break;
+                case AdStatus.AD_VIDEO_START:
+                  HiAdLog.i(TAG, `onAdVideoStart`);
+                  break;
+                case AdStatus.AD_COMPLETED:
+                  HiAdLog.i(TAG, `onAdCompleted`);
+                  break;
+                default:
+                  break;
+              }
+            }
+          });
       });
-    });
   }
 
-  // 取消订阅
+  // Cancel the subscription.
   public unRegisterPPSReceiver(): void {
     commonEventManager.unsubscribe(this.subscriber, (err: BusinessError) => {
       if (err) {
-        HiAdLog.e(TAG, `unsubscribe error, ${JSON.stringify(err)}`);
+        HiAdLog.e(TAG, `Failed to unsubscribe, errorCode: ${err.code}, errorMsg: ${err.message}`);
       } else {
-        HiAdLog.i(TAG, `succeeded in unsubscribing`);
+        HiAdLog.i(TAG, `Succeeded in unsubscribing`);
         this.subscriber = null;
       }
     });

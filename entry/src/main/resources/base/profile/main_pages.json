@@ -5,7 +5,6 @@
     "pages/SplashFullScreenAdPage",
     "pages/SplashHalfScreenAdPage",
     "pages/PlacementAdPage",
-    "pages/BannerAdPage",
-    "pages/SelfRenderAdPage"
+    "pages/BannerAdPage"
   ]
 }

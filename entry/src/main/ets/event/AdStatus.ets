@@ -15,21 +15,21 @@
  */
 
 export enum AdStatus {
-  AD_LOAD = "onAdLoad",
+  AD_LOAD = 'onAdLoad',
 
-  AD_FAIL = "onAdFail",
+  AD_FAIL = 'onAdFail',
 
-  AD_OPEN = "onAdOpen",
+  AD_OPEN = 'onAdOpen',
 
-  AD_CLICKED = "onAdClick",
+  AD_CLICKED = 'onAdClick',
 
-  AD_CLOSED = "onAdClose",
+  AD_CLOSED = 'onAdClose',
 
-  AD_REWARDED = "onAdReward",
+  AD_REWARDED = 'onAdReward',
 
-  AD_VIDEO_START = "onVideoPlayBegin",
+  AD_VIDEO_START = 'onVideoPlayBegin',
 
-  AD_COMPLETED = "onVideoPlayEnd",
+  AD_COMPLETED = 'onVideoPlayEnd',
 
   MEDIA_PROGRESS = 'onMediaProgress',
 
@@ -49,5 +49,5 @@ export enum AdStatus {
 
   LANDSCAPE = 'onLandscape',
 
-  MEDIA_COUNTDOWN = 'onMediaCountdown',
+  MEDIA_COUNTDOWN = 'onMediaCountdown'
 }

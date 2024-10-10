@@ -17,21 +17,6 @@
         "name": "release"
       }
     ],
-    "signingConfigs": [
-      {
-        "name": "default",
-        "type": "HarmonyOS",
-        "material": {
-          "certpath": "C:\\Users\\l30054320\\.ohos\\config\\default_AdsKit-SampleCode-ClientDemo-ArkTS_Iisw6OwG4Wt3JX5Nxz1-5ymeAS_Gyl1Xjtbs4B9L6Ac=.cer",
-          "storePassword": "0000001A508679357B6BCA22A63C361C9E1D96F49292014F2ACEA43D39861CAEAA7561D60F8D0BA6170A",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001ACCF400B6E01B0F0FC27BD2FBC367CC774ED5746036AE9625FB17735A4370D5E5F2EB87A17326",
-          "profile": "C:\\Users\\l30054320\\.ohos\\config\\default_AdsKit-SampleCode-ClientDemo-ArkTS_Iisw6OwG4Wt3JX5Nxz1-5ymeAS_Gyl1Xjtbs4B9L6Ac=.p7b",
-          "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\l30054320\\.ohos\\config\\default_AdsKit-SampleCode-ClientDemo-ArkTS_Iisw6OwG4Wt3JX5Nxz1-5ymeAS_Gyl1Xjtbs4B9L6Ac=.p12"
-        }
-      }
-    ]
   },
   "modules": [
     {

@@ -19,7 +19,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 class Logger {
   private tag: number;
   private pre: string;
-  private format: string = "%{public}s, %{public}s";
+  private format: string = '%{public}s, %{public}s';
 
   constructor(pre: string) {
     this.pre = pre

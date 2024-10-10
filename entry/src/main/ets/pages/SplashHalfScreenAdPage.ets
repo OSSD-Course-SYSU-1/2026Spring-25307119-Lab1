@@ -30,7 +30,8 @@ export struct SplashHalfScreenAdPage {
   aboutToAppear() {
     HiAdLog.i(TAG, `SplashHalfScreenAdPage aboutToAppear`);
     const params: Record<string, Object> = router.getParams() as Record<string, Object>;
-    if(params && params.ads as Array<advertising.Advertisement> && params.displayOptions as advertising.AdDisplayOptions) {
+    if (params && params.ads as Array<advertising.Advertisement> &&
+      params.displayOptions as advertising.AdDisplayOptions) {
       this.ads = params.ads as Array<advertising.Advertisement>;
       this.displayOptions = params.displayOptions as advertising.AdDisplayOptions;
     } else {
@@ -40,7 +41,8 @@ export struct SplashHalfScreenAdPage {
 
   build() {
     Column() {
-      AdComponent({ ads: this.ads, displayOptions: this.displayOptions,
+      AdComponent({
+        ads: this.ads, displayOptions: this.displayOptions,
         interactionListener: {
           onStatusChanged: (status: string, ad: advertising.Advertisement, data: string) => {
             switch (status) {
@@ -69,21 +71,34 @@ export struct SplashHalfScreenAdPage {
                 })
                 break;
             }
-          } }
+          }
+        }
       })
         .width('100%')
         .height('87%')
 
-      Column({}) {
+      Column() {
         Row() {
-          Image($r('app.media.video')).width(24).height(24).margin({ right: 8 })
-          Text($r('app.string.video')).fontColor('#1A1A1A').fontSize(16).width(32).height(21)
+          Image($r('app.media.video'))
+            .width(24)
+            .height(24)
+            .margin({ right: 8 })
+          Text($r('app.string.video'))
+            .fontColor($r('app.color.splash_text_font_color'))
+            .fontSize(16)
+            .width(32)
+            .height(21)
         }.margin({ bottom: 8 })
 
         Column() {
-          Text($r('app.string.copyright')).fontColor('#1A1A1A').fontSize(9).height(15)
+          Text($r('app.string.copyright'))
+            .fontColor($r('app.color.splash_text_font_color'))
+            .fontSize(9)
+            .height(15)
         }
       }.margin({ top: 29, left: 16, right: 16 })
-    }.width('100%').height('100%')
+    }
+    .width('100%')
+    .height('100%')
   }
 }

@@ -18,14 +18,15 @@
 export struct CustomButton {
   private mText: string | Resource = '';
   private mHeight: number = 40;
-  private mOnClick: (event?: ClickEvent) => void = (): void => {};
+  private mOnClick: (event?: ClickEvent) => void = (): void => {
+  };
 
   build() {
     Column() {
       Button(this.mText)
-        .backgroundColor('#d3d4d6')
+        .backgroundColor($r('app.color.custom_button_background'))
         .fontSize(20)
-        .fontColor('#000')
+        .fontColor($r('app.color.custom_button_font_color'))
         .fontWeight(FontWeight.Normal)
         .align(Alignment.Center)
         .type(ButtonType.Capsule)

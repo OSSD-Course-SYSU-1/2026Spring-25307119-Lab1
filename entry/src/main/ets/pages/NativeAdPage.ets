@@ -16,7 +16,6 @@
 
 import { router, Prompt } from '@kit.ArkUI';
 import { advertising, AdComponent } from '@kit.AdsKit';
-import { ActionBar } from '../widgets/action-bar';
 import { AdStatus } from '../event/AdStatus';
 import HiAdLog from '../log/HiAdLog';
 
@@ -31,7 +30,8 @@ export struct ShowNativeAd {
   aboutToAppear() {
     HiAdLog.i(TAG, `NativeAdPage aboutToAppear`);
     const params: Record<string, Object> = router.getParams() as Record<string, Object>;
-    if(params && params.ads as Array<advertising.Advertisement> && params.displayOptions as advertising.AdDisplayOptions) {
+    if (params && params.ads as Array<advertising.Advertisement> &&
+      params.displayOptions as advertising.AdDisplayOptions) {
       this.ads = params.ads as Array<advertising.Advertisement>;
       this.displayOptions = params.displayOptions as advertising.AdDisplayOptions;
     } else {
@@ -41,11 +41,12 @@ export struct ShowNativeAd {
 
   build() {
     Column() {
-      // AdComponent组件用于展示原生广告
-      AdComponent({ ads: this.ads, displayOptions: this.displayOptions,
+      // AdComponent is used to show a native ad.
+      AdComponent({
+        ads: this.ads, displayOptions: this.displayOptions,
         interactionListener: {
           onStatusChanged: (status: string, ad: advertising.Advertisement, data: string) => {
-            switch(status) {
+            switch (status) {
               case AdStatus.AD_OPEN:
                 HiAdLog.i(TAG, `onAdOpen`);
                 Prompt.showToast({
@@ -68,10 +69,13 @@ export struct ShowNativeAd {
                 });
                 break;
             }
-          }}})
+          }
+        }
+      })
         .width('100%')
         .height('100%')
-
-    }.width('100%').height('100%')
+    }
+    .width('100%')
+    .height('100%')
   }
 }

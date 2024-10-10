@@ -3,6 +3,26 @@
     {
       "name": "start_window_background",
       "value": "#FFFFFF"
+    },
+    {
+      "name": "count_down_background_top",
+      "value": "#33000000"
+    },
+    {
+      "name": "count_down_background_botton",
+      "value": "#33FFFFFF"
+    },
+    {
+      "name": "splash_text_font_color",
+      "value": "#1A1A1A"
+    },
+    {
+      "name": "custom_button_background",
+      "value": "#d3d4d6"
+    },
+    {
+      "name": "custom_button_font_color",
+      "value": "#000"
     }
   ]
 }

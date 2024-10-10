@@ -29,7 +29,12 @@ export struct ActionBar {
       }
     }
     .width('100%')
-    .padding({ top: 16, bottom: 16, left: 24, right: 24 })
+    .padding({
+      top: 16,
+      bottom: 16,
+      left: 24,
+      right: 24
+    })
     .backgroundColor(Color.Black)
   }
 }

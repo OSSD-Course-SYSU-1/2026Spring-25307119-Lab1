@@ -16,6 +16,7 @@
 
 import { window, router, Prompt } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { common } from '@kit.AbilityKit';
 import { advertising, AdComponent } from '@kit.AdsKit';
 import { AdStatus } from '../event/AdStatus';
 import HiAdLog from '../log/HiAdLog';
@@ -26,18 +27,29 @@ const TAG = 'Ads Demo-PlacementAdPage';
 @Entry
 @Component
 export struct PlacementAdPage {
+  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
   portrait: boolean = true;
   private ads: Array<advertising.Advertisement> = [];
   private displayOptions?: advertising.AdDisplayOptions;
   private adOptions?: advertising.AdOptions;
-  // 用于渲染右上角倒计时
+  // Used to render the countdown in the upper right corner.
   private countDownTxtPlaceholder: string = '%d | %s';
   @State countDownTxt: string = '';
 
   aboutToAppear() {
     HiAdLog.i(TAG, `PlacementAdPage aboutToAppear`);
+    // Set the immersive mode.
+    window.getLastWindow(this.context, (err: BusinessError, win) => {
+      try {
+        win.setSpecificSystemBarEnabled('navigation', false);
+        win.setSpecificSystemBarEnabled('navigationIndicator', false);
+      } catch (exception) {
+        HiAdLog.w(TAG, `setSpecificSystemBarEnabled error`);
+      }
+    });
     const params: Record<string, Object> = router.getParams() as Record<string, Object>;
-    if(params && params.ads as Array<advertising.Advertisement> && params.displayOptions as advertising.AdDisplayOptions) {
+    if (params && params.ads as Array<advertising.Advertisement> &&
+      params.displayOptions as advertising.AdDisplayOptions) {
       this.ads = params.ads as Array<advertising.Advertisement>;
       this.displayOptions = params.displayOptions as advertising.AdDisplayOptions;
       this.adOptions = params.adOptions as advertising.AdOptions;
@@ -49,7 +61,8 @@ export struct PlacementAdPage {
 
   build() {
     Stack({ alignContent: Alignment.TopEnd }) {
-      AdComponent({ ads: this.ads, displayOptions: this.displayOptions,
+      AdComponent({
+        ads: this.ads, displayOptions: this.displayOptions,
         interactionListener: {
           onStatusChanged: (status: string, ad: advertising.Advertisement, data: string) => {
             switch (status) {
@@ -77,42 +90,42 @@ export struct PlacementAdPage {
                 });
                 break;
               case AdStatus.MEDIA_PROGRESS:
-                HiAdLog.i(TAG, `onMediaProgress, data: ${JSON.stringify(data)}`);
+                HiAdLog.i(TAG, `onMediaProgress`);
                 Prompt.showToast({
                   message: 'placement ad onMediaProgress',
                   duration: 1000
                 });
                 break;
               case AdStatus.MEDIA_START:
-                HiAdLog.i(TAG, `onMediaStart, data: ${JSON.stringify(data)}`);
+                HiAdLog.i(TAG, `onMediaStart`);
                 Prompt.showToast({
                   message: 'placement ad onMediaStart',
                   duration: 1000
                 });
                 break;
               case AdStatus.MEDIA_PAUSE:
-                HiAdLog.i(TAG, `onMediaPause, data: ${JSON.stringify(data)}`);
+                HiAdLog.i(TAG, `onMediaPause`);
                 Prompt.showToast({
                   message: 'placement ad onMediaPause',
                   duration: 1000
                 });
                 break;
               case AdStatus.MEDIA_STOP:
-                HiAdLog.i(TAG, `onMediaStop, data: ${JSON.stringify(data)}`);
+                HiAdLog.i(TAG, `onMediaStop`);
                 Prompt.showToast({
                   message: 'placement ad onMediaStop',
                   duration: 1000
                 });
                 break;
               case AdStatus.MEDIA_COMPLETE:
-                HiAdLog.i(TAG, `onMediaComplete, data: ${JSON.stringify(data)}`);
+                HiAdLog.i(TAG, `onMediaComplete`);
                 Prompt.showToast({
                   message: 'placement ad onMediaComplete',
                   duration: 1000
                 });
                 break;
               case AdStatus.MEDIA_ERROR:
-                HiAdLog.i(TAG, `onMediaError, data: ${JSON.stringify(data)}`);
+                HiAdLog.i(TAG, `onMediaError`);
                 Prompt.showToast({
                   message: 'placement ad onMediaError',
                   duration: 1000
@@ -120,38 +133,49 @@ export struct PlacementAdPage {
                 break;
               case AdStatus.MEDIA_COUNTDOWN:
                 try {
-                  HiAdLog.i(TAG, `onMediaCountdown, data: ${JSON.stringify(data)}`);
+                  HiAdLog.i(TAG, `onMediaCountdown`);
                   const parseData: Record<string, number> = JSON.parse(JSON.stringify(data));
                   this.updateCountDownTxt(parseData.countdownTime);
-                } catch(e) {
-                  HiAdLog.e(TAG, `parse error code: ${e.code}, msg: ${e.message}`);
+                } catch (e) {
+                  HiAdLog.e(TAG, `Failed to parse data, errorCode: ${e.code}, errorMsg: ${e.message}`);
                 }
                 break;
             }
-          } } })
+          }
+        }
+      })
         .width('100%')
         .height('100%')
 
 
       Row() {
         if (this.countDownTxt) {
-          Text(this.countDownTxt.split('').join('\u200B'))
-            .fontSize(12)
-            .textAlign(TextAlign.Center)
-            .maxLines(1)
-            .fontColor(Color.White)
-            .lineHeight(12)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .maxLines(1)
-            .backgroundColor('#66000000')
-            .border({ radius: 25 })
-            .padding({ left: 8, right: 8, top: 6, bottom: 6 })
-            .margin({ right: 16, top: 16 })
-            .height(24)
-            .constraintSize({ minWidth: 60, maxWidth: 100 })
-            .onClick((event: ClickEvent) => {
-              HiAdLog.i(TAG, 'onVipClicked, do something...');
-            })
+          Row() {
+            Text(this.countDownTxt.split('').join('\u200B'))
+              .fontSize(12)
+              .textAlign(TextAlign.Center)
+              .maxLines(1)
+              .fontColor(Color.White)
+              .lineHeight(12)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .maxLines(1)
+              .backgroundColor($r('app.color.count_down_background_top'))
+              .border({ radius: 25 })
+              .padding({
+                left: 8,
+                right: 8,
+                top: 6,
+                bottom: 6
+              })
+              .onClick((event: ClickEvent) => {
+                HiAdLog.i(TAG, 'OnVipClicked, do something...');
+              })
+          }
+          .backgroundColor($r('app.color.count_down_background_botton'))
+          .margin({ right: 16, top: 16 })
+          .height(24)
+          .constraintSize({ minWidth: 60, maxWidth: 100 })
+          .border({ radius: 25 })
         }
       }
       .alignItems(VerticalAlign.Top)
@@ -161,12 +185,12 @@ export struct PlacementAdPage {
   }
 
   /**
-   * 设置竖屏
+   * Set the screen to portrait.
    */
   private setWindowPortrait() {
     HiAdLog.i(TAG, `setWindowPortrait, portrait: ${this.portrait}`);
     if (!this.portrait) {
-      window.getLastWindow(getContext(this), (err: BusinessError, win)=>{
+      window.getLastWindow(getContext(this), (err: BusinessError, win) => {
         win.setPreferredOrientation(window.Orientation.PORTRAIT);
       });
       this.portrait = true;
@@ -176,12 +200,12 @@ export struct PlacementAdPage {
   }
 
   /**
-   * 设置横屏（正向）
+   * Set the screen to landscape (forward).
    */
   private setWindowLandscape() {
     HiAdLog.i(TAG, `setWindowLandscape, portrait: ${this.portrait}`);
     if (this.portrait) {
-      window.getLastWindow(getContext(this), (err: BusinessError, win)=>{
+      window.getLastWindow(getContext(this), (err: BusinessError, win) => {
         win.setPreferredOrientation(window.Orientation.LANDSCAPE);
       });
       this.portrait = false;
@@ -213,10 +237,10 @@ export struct PlacementAdPage {
 
     let decodeUrl = str;
     try {
-      // 防止空格被替换为+号导致解码失败
+      // Prevent the decoding failure caused by the replacement of spaces with plus signs (+).
       decodeUrl = decodeURIComponent(str.replace(/\+/g, '%20'));
     } catch (e) {
-      HiAdLog.e(TAG, `decodeURIComponent error code, ${e.code}, msg: ${e.message}`);
+      HiAdLog.e(TAG, `Failed to decodeURIComponent, errorCode: ${e.code}, errorMsg: ${e.message}`);
     }
 
     return decodeUrl;
@@ -227,7 +251,7 @@ export struct PlacementAdPage {
       return true;
     }
 
-    if (typeof str === "string") {
+    if (typeof str === 'string') {
       return str.trim().length === 0;
     }
     return false;
