@@ -16,21 +16,21 @@ The sample code of Ads Kit for HarmonyOS ArkTS describes how to use APIs of Ads 
 Install the demo on a phone running HarmonyOS.
 
 ## Preview
-| **Home screen for various ad formats**              | **Rewarded ad**                       | **Native video ad**                                |
-|-----------------------------------------------------|------------------------------------|--------------------------------------------|
-| ![avatar](./screenshots/device_en/home_page_en.jpg) | ![avatar](./screenshots/device_en/reward_en.jpg) | ![avatar](./screenshots/device_en/native_video_en.jpg) |
+| **Home screen for various ad formats**              | **Rewarded ad**                                  | **Native video ad**                                    |
+|-----------------------------------------------------|--------------------------------------------------|--------------------------------------------------------|
+| ![avatar](./screenshots/device_en/home_page_en.png) | ![avatar](./screenshots/device_en/reward_en.png) | ![avatar](./screenshots/device_en/native_video_en.png) |
 
-| **Native large image ad**                      | **Native small image ad**                        | **Native three-image ad**                        |
-|------------------------------------------------|------------------------------------|------------------------------------|
-| ![avatar](./screenshots/device_en/native_big_en.jpg) | ![avatar](./screenshots/device_en/native_small_en.jpg) | ![avatar](./screenshots/device_en/native_three_en.jpg) |
+| **Native large image ad**                            | **Native small image ad**                              | **Native three-image ad**                              |
+|------------------------------------------------------|--------------------------------------------------------|--------------------------------------------------------|
+| ![avatar](./screenshots/device_en/native_big_en.png) | ![avatar](./screenshots/device_en/native_small_en.png) | ![avatar](./screenshots/device_en/native_three_en.png) |
 
 | **Splash video ad**                                    | **Splash image ad**                                    | **Image roll ad**                                |
-|--------------------------------------------------|--------------------------------------------------------|--------------------------------------------------|
-| ![avatar](./screenshots/device_en/splash_video_en.jpg) | ![avatar](./screenshots/device_en/splash_pictures_en.png) | ![avatar](./screenshots/device_en/placement_en.png) |
+|--------------------------------------------------------|--------------------------------------------------------|--------------------------------------------------|
+| ![avatar](./screenshots/device_en/splash_video_en.png) | ![avatar](./screenshots/device_en/splash_pictures_en.png) | ![avatar](./screenshots/device_en/placement_en.png) |
 
-| **Interstitial video ad**                                          | **Interstitial image ad**     | **Banner ad**                                 |
-|--------------------------------------------------------|-------------------|-----------------------------------------------|
-| ![avatar](./screenshots/device_en/interstitial_video_en.jpg) | ![avatar](./screenshots/device_en/interstitial_picture_en.jpg) | ![avatar](./screenshots/device_en/banner_en.jpg) |
+| **Interstitial video ad**                                    | **Interstitial image ad**                                      | **Banner ad**                                    |
+|--------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------|
+| ![avatar](./screenshots/device_en/interstitial_video_en.png) | ![avatar](./screenshots/device_en/interstitial_picture_en.png) | ![avatar](./screenshots/device_en/banner_en.png) |
 
 ## Project Directory
 ```
