@@ -17,19 +17,19 @@
 ## 效果预览
 | **广告样式主页面**                                  | **激励广告页面**                        | **原生视频广告页面**                                 |
 |-------------------------------------------------|------------------------------------|--------------------------------------------|
-| ![avatar](./screenshots/device_en/home_page_en.png) | ![avatar](./screenshots/device_en/reward_en.png) | ![avatar](./screenshots/device_en/native_video_en.png) | 
+| ![avatar](./screenshots/device/home_page.jpg) | ![avatar](./screenshots/device/reward.jpg) | ![avatar](./screenshots/device/native_video.jpg) | 
 
 | **原生大图广告页面**                       | **原生小图广告页面**                         | **原生三图广告页面**                         |
 |------------------------------------|------------------------------------|------------------------------------|
-| ![avatar](./screenshots/device_en/native_big_en.png) | ![avatar](./screenshots/device_en/native_small_en.png) | ![avatar](./screenshots/device_en/native_three_en.png)  |
+| ![avatar](./screenshots/device/native_large_image.jpg) | ![avatar](./screenshots/device/native_small_image.jpg) | ![avatar](./screenshots/device/native_three_image.jpg) |
 
 | **开屏视频广告页面**                                     | **开屏图片广告页面**                                        |**贴片图片广告页面**                                        |
 |--------------------------------------------------|-----------------------------------------------------|---------------------------------------------------|
-|  ![avatar](./screenshots/device_en/splash_video_en.png) | ![avatar](./screenshots/device_en/splash_pictures_en.png) | ![avatar](./screenshots/device_en/placement_en.png) |
+| ![avatar](./screenshots/device/splash_video.jpg) | ![avatar](./screenshots/device/splash_pictures.jpg) |![avatar](./screenshots/device/placement.jpg) |
 
 | **插屏视频广告页面**                                           | **插屏图片广告页面**      | **Banner广告页面** |
 |--------------------------------------------------------|-------------------|--------------------------------------------------------|
-| ![avatar](./screenshots/device_en/interstitial_video_en.png) | ![avatar](./screenshots/device_en/interstitial_picture_en.png) | ![avatar](./screenshots/device_en/banner_en.png) |
+| ![avatar](./screenshots/device/interstitial_video.jpg) | ![avatar](./screenshots/device/interstitial_pictures.jpg) | ![avatar](./screenshots/device/banner.jpg) |
 
 ## 工程目录
 ```
