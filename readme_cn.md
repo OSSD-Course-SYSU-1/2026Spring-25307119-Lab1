@@ -2,17 +2,19 @@
 ## 目录
 
 * [简介](#简介)
-* [安装](#安装)
+* [使用说明](#使用说明)
 * [效果预览](#效果预览)
 * [工程目录](#工程目录)
 * [示例代码](#示例代码)
+* [相关权限](#相关权限)
+* [约束与限制](#约束与限制)
 
 
 ## 简介
 鲸鸿动能广告服务HarmonyOS ArkTs示例代码向您介绍如何在应用中使用将鲸鸿动能API并实现广告展示。
 
-## 安装
-在HarmonyOS系统手机上安装该示例代码项目。
+## 使用说明
+运行本示例前需要参考指导进行：[配置应用签名信息](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/application-dev-overview-V5#section42841246144813)。
 
 ## 效果预览
 | **广告样式主页面**                                  | **激励广告页面**                        | **原生视频广告页面**                                 |
@@ -61,29 +63,33 @@
 鲸鸿动能广告服务HarmonyOS-ArkTs示例代码为您提供各种广告样式的展示页面。
 本示例代码包括以下文件，便于您进行广告请求、广告展示：
 
-1). AdsServicePage.ets
+1. AdsServicePage.ets
 流量变现服务演示界面，可以请求并展示Banner广告、激励广告、原生广告、开屏广告、贴片广告、插屏广告，点击对应按钮可以展示相应的广告内容。
 <br>代码位置： entry\src\main\ets\pages\AdsServicePage.ets</br>
 
-2). NativeAdPage.ets
+2. NativeAdPage.ets
 用于展示原生广告。
 <br>代码位置：entry\src\main\ets\pages\NativeAdPage.ets</br>
 
-3). PlacementAdPage.ets
+3. PlacementAdPage.ets
 用于展示贴片广告。
 <br>代码位置：entry\src\main\ets\pages\PlacementAdPage.ets</br>
 
-4). SplashFullScreenAdPage.ets
+4. SplashFullScreenAdPage.ets
 用于展示开屏全屏广告。
 <br>代码位置：entry\src\main\ets\pages\SplashFullScreenAdPage.ets</br>
 
-5). SplashHalfScreenAdPage.ets
+5. SplashHalfScreenAdPage.ets
 用于展示开屏半屏广告。
-<br>代码位置：entry\src\main\ets\pages\SplashFullScreenAdPage.ets</br>
+<br>代码位置：entry\src\main\ets\pages\SplashHalfScreenAdPage.ets</br>
 
-6). BannerAdPage.ets
+6. BannerAdPage.ets
 用于展示Banner广告。
 <br>代码位置：entry\src\main\ets\pages\BannerAdPage.ets</br>
+
+## 相关权限
+
+* 获取OAID功能需要申请广告跨应用关联访问权限：[ohos.permission.APP_TRACKING_CONSENT](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/permissions-for-all-V5#ohospermissionapp_tracking_consent)。
 
 ## 约束与限制
 
