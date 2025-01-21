@@ -29,7 +29,7 @@
 |--------------------------------------------------|-----------------------------------------------------|---------------------------------------------------|
 | ![avatar](./screenshots/device/splash_video.jpg) | ![avatar](./screenshots/device/splash_pictures.jpg) |![avatar](./screenshots/device/placement.jpg) |
 
-| **插屏视频广告页面**                                           | **插屏图片广告页面**      | **Banner广告页面** |
+| **插屏视频广告页面**                                           | **插屏图片广告页面**      | **横幅广告页面** |
 |--------------------------------------------------------|-------------------|--------------------------------------------------------|
 | ![avatar](./screenshots/device/interstitial_video.jpg) | ![avatar](./screenshots/device/interstitial_pictures.jpg) | ![avatar](./screenshots/device/banner.jpg) |
 
@@ -48,7 +48,7 @@
 │ │ └─HiAdLog.ets                  // 日志组件
 │ ├─pages                          // 存放页面文件目录                
 │ │ ├─AdsServicePage.ets           // 应用主页面
-│ │ ├─BannerAdPage.ets             // Banner广告主页面
+│ │ ├─BannerAdPage.ets             // 横幅广告主页面
 │ │ ├─NativeAdPage.ets             // 原生广告主页面 
 │ │ ├─PlacementAdPage.ets          // 贴片广告主页面
 │ │ ├─SplashFullScreenAdPage.ets   // 开屏广告全屏开屏广告页面                
@@ -64,7 +64,7 @@
 本示例代码包括以下文件，便于您进行广告请求、广告展示：
 
 1. AdsServicePage.ets
-流量变现服务演示界面，可以请求并展示Banner广告、激励广告、原生广告、开屏广告、贴片广告、插屏广告，点击对应按钮可以展示相应的广告内容。
+流量变现服务演示界面，可以请求并展示横幅广告、激励广告、原生广告、开屏广告、贴片广告、插屏广告，点击对应按钮可以展示相应的广告内容。
 <br>代码位置： entry\src\main\ets\pages\AdsServicePage.ets</br>
 
 2. NativeAdPage.ets
@@ -84,7 +84,7 @@
 <br>代码位置：entry\src\main\ets\pages\SplashHalfScreenAdPage.ets</br>
 
 6. BannerAdPage.ets
-用于展示Banner广告。
+用于展示横幅广告。
 <br>代码位置：entry\src\main\ets\pages\BannerAdPage.ets</br>
 
 ## 相关权限
