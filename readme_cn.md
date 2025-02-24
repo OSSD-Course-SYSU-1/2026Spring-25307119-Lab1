@@ -14,7 +14,7 @@
 鲸鸿动能广告服务HarmonyOS ArkTs示例代码向您介绍如何在应用中使用将鲸鸿动能API并实现广告展示。
 
 ## 使用说明
-运行本示例前需要参考指导进行：[配置应用签名信息](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/application-dev-overview-V5#section42841246144813)。
+运行本示例前需要参考指导[配置应用签名信息](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/application-dev-overview-V5#section42841246144813)。
 
 ## 效果预览
 | **广告样式主页面**                                  | **激励广告页面**                        | **原生视频广告页面**                                 |

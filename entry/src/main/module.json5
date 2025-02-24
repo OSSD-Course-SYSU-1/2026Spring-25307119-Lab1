@@ -43,9 +43,6 @@
           ],
           "when": "inuse"
         }
-      },
-      {
-        "name": "ohos.permission.INTERNET"
       }
     ]
   }
