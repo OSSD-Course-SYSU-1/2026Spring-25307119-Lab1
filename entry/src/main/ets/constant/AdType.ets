@@ -15,21 +15,10 @@
  */
 
 export enum AdType {
-  // Rewarded ad.
-  REWARD_AD = 7,
-
-  // Native ad.
-  NATIVE_AD = 3,
-
-  // Splash ad.
-  SPLASH_AD = 1,
-
-  // Interstitial ad.
-  INTERSTITIAL_AD = 12,
-
-  // Roll ad.
-  PLACEMENT_AD = 60,
-
-  // Banner ad.
-  BANNER_AD = 8
+  SPLASH = 1,
+  NATIVE = 3,
+  REWARD = 7,
+  BANNER = 8,
+  INTERSTITIAL = 12,
+  ROLL = 60
 }

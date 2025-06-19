@@ -14,110 +14,80 @@
    limitations under the License.
  */
 
-import { commonEventManager, BusinessError } from '@kit.BasicServicesKit';
-import { Prompt } from '@kit.ArkUI';
-import HiAdLog from '../log/HiAdLog';
-import { AdStatus } from './AdStatus';
+import { BusinessError, commonEventManager } from '@kit.BasicServicesKit';
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { AdStatus } from '../constant/AdStatus';
 
-const KEY_REWARD_DATA = 'reward_ad_data';
-const KEY_REWARD_STATUS = 'reward_ad_status';
-const TAG = 'Ads Demo-RewardAdStatusHandler';
+const TAG: string = 'Ads Demo-RewardAdStatusHandler';
+const KEY_REWARD_DATA: string = 'reward_ad_data';
+const KEY_REWARD_STATUS: string = 'reward_ad_status';
 
 export class RewardAdStatusHandler {
   // Used to save the created subscriber object for subsequent subscription and unsubscription.
   private subscriber: commonEventManager.CommonEventSubscriber | null = null;
 
-  public registerPPSReceiver(): void {
+  registerPPSReceiver(): void {
     if (this.subscriber) {
       this.unRegisterPPSReceiver();
     }
-    // Subscriber information.
     const subscribeInfo: commonEventManager.CommonEventSubscribeInfo = {
       events: ['com.huawei.hms.pps.action.PPS_REWARD_STATUS_CHANGED'],
       publisherBundleName: 'com.huawei.hms.adsservice'
     };
-    // Callback for subscriber creation.
-    commonEventManager.createSubscriber(subscribeInfo,
-      (err: BusinessError, commonEventSubscriber: commonEventManager.CommonEventSubscriber) => {
+    commonEventManager.createSubscriber(subscribeInfo, (err: BusinessError, commonEventSubscriber:
+      commonEventManager.CommonEventSubscriber) => {
+      if (err) {
+        hilog.error(0x0000, TAG, `Failed to create subscriber. Code is ${err.code}, message is ${err.message}`);
+        return;
+      }
+      hilog.info(0x0000, TAG, 'Succeeded in creating subscriber');
+      this.subscriber = commonEventSubscriber;
+      if (!this.subscriber) {
+        hilog.warn(0x0000, TAG, 'Need create subscriber');
+        return;
+      }
+      commonEventManager.subscribe(this.subscriber, (err: BusinessError, commonEventSubscriber:
+        commonEventManager.CommonEventData) => {
         if (err) {
-          HiAdLog.e(TAG, `Failed to create subscriber, errorCode: ${err.code}, errorMsg: ${err.message}`);
-          return;
+          hilog.error(0x0000, TAG, `Failed to subscribe. Code is ${err.code}, message is ${err.message}`);
+        } else {
+          hilog.info(0x0000, TAG, 'Succeeded in subscribing data');
+          const status: string = commonEventSubscriber?.parameters?.[KEY_REWARD_STATUS];
+          switch (status) {
+            case AdStatus.AD_OPEN:
+              hilog.info(0x0000, TAG, 'Status is onAdOpen');
+              break;
+            case AdStatus.AD_CLICKED:
+              hilog.info(0x0000, TAG, 'Status is onAdClick');
+              break;
+            case AdStatus.AD_CLOSED:
+              hilog.info(0x0000, TAG, 'Status is onAdClose');
+              this.unRegisterPPSReceiver();
+              break;
+            case AdStatus.AD_REWARDED:
+              const rewardData: Record<string, string | number> = commonEventSubscriber?.parameters?.[KEY_REWARD_DATA];
+              const rewardType: string = rewardData?.rewardType as string;
+              const rewardAmount: number = rewardData?.rewardAmount as number;
+              hilog.info(0x0000, TAG, `Status is onAdReward. Type is ${rewardType}, Amount is ${rewardAmount}`);
+              break;
+            case AdStatus.VIDEO_PLAY_BEGIN:
+              hilog.info(0x0000, TAG, 'Status is onVideoPlayBegin');
+              break;
+            case AdStatus.VIDEO_PLAY_END:
+              hilog.info(0x0000, TAG, 'Status is onVideoPlayEnd');
+              break;
+          }
         }
-        HiAdLog.i(TAG, `Succeeded in creating subscriber`);
-        this.subscriber = commonEventSubscriber;
-        // Callback for common event subscription.
-        if (!this.subscriber) {
-          HiAdLog.i(TAG, `need create subscriber`);
-          return;
-        }
-        commonEventManager.subscribe(this.subscriber,
-          (err: BusinessError, commonEventData: commonEventManager.CommonEventData) => {
-            if (err) {
-              HiAdLog.e(TAG, `subscribe error, errorCode: ${err.code}, errorMsg: ${err.message}`);
-            } else {
-              HiAdLog.i(TAG, 'subscribe data');
-              const status: string = commonEventData?.parameters?.[KEY_REWARD_STATUS];
-              switch (status) {
-                case AdStatus.AD_OPEN:
-                  HiAdLog.i(TAG, `onAdOpen`);
-                  Prompt.showToast({
-                    message: 'reward ad open',
-                    duration: 1000
-                  });
-                  break;
-                case AdStatus.AD_CLICKED:
-                  HiAdLog.i(TAG, `onAdClick`);
-                  Prompt.showToast({
-                    message: 'reward ad click',
-                    duration: 1000
-                  });
-                  break;
-                case AdStatus.AD_CLOSED:
-                  HiAdLog.i(TAG, `onAdClose`);
-                  Prompt.showToast({
-                    message: 'reward ad close',
-                    duration: 1000
-                  });
-                  this.unRegisterPPSReceiver();
-                  break;
-                case AdStatus.AD_REWARDED:
-                  const rewardData: Record<string, string | number> = commonEventData?.parameters?.[KEY_REWARD_DATA];
-                  const rewardType: string = rewardData?.rewardType as string;
-                  const rewardAmount: number = rewardData?.rewardAmount as number;
-                  HiAdLog.i(TAG, `onAdReward, rewardType: ${rewardType}, rewardAmount: ${rewardAmount}`);
-                  Prompt.showToast({
-                    message: `reward ad reward, rewardType: ${rewardType}, rewardAmount: ${rewardAmount}`,
-                    duration: 1000
-                  });
-                  break;
-                case AdStatus.AD_VIDEO_START:
-                  HiAdLog.i(TAG, `onAdVideoStart`);
-                  Prompt.showToast({
-                    message: 'reward ad video start',
-                    duration: 1000
-                  });
-                  break;
-                case AdStatus.AD_COMPLETED:
-                  HiAdLog.i(TAG, `onAdCompleted`);
-                  Prompt.showToast({
-                    message: 'reward ad completed',
-                    duration: 1000
-                  });
-                  break;
-                default:
-                  break;
-              }
-            }
-          });
       });
+    });
   }
 
-  public unRegisterPPSReceiver(): void {
+  unRegisterPPSReceiver(): void {
     commonEventManager.unsubscribe(this.subscriber, (err: BusinessError) => {
       if (err) {
-        HiAdLog.e(TAG, `unsubscribe error, code: ${err.code}, message: ${err.message}`);
+        hilog.error(0x0000, TAG, `Failed to unsubscribe. Code is ${err.code}, message is ${err.message}`);
       } else {
-        HiAdLog.i(TAG, 'Succeeded in unsubscribing');
+        hilog.info(0x0000, TAG, 'Succeeded in unsubscribing');
         this.subscriber = null;
       }
     });

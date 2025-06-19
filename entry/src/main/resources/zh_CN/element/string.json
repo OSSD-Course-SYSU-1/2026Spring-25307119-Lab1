@@ -25,7 +25,7 @@
       "value": "原生视频广告"
     },
     {
-      "name": "request_native_big_image_ad_btn",
+      "name": "request_native_large_image_ad_btn",
       "value": "原生大图广告"
     },
     {
@@ -45,7 +45,7 @@
       "value": "开屏图片广告"
     },
     {
-      "name": "request_placement_ad_btn",
+      "name": "request_roll_ad_btn",
       "value": "贴片广告"
     },
     {
@@ -66,7 +66,7 @@
     },
     {
       "name": "copyright",
-      "value": "版权所有 © 2011-2017 华为技术有限公司"
+      "value": "版权所有 © 2022-2025 华为技术有限公司"
     },
     {
       "name": "app_tracking_permission_reason",

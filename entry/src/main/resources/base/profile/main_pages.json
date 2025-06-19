@@ -1,10 +1,5 @@
 {
   "src": [
-    "pages/AdsServicePage",
-    "pages/NativeAdPage",
-    "pages/SplashFullScreenAdPage",
-    "pages/SplashHalfScreenAdPage",
-    "pages/PlacementAdPage",
-    "pages/BannerAdPage"
+    "pages/Index"
   ]
 }
