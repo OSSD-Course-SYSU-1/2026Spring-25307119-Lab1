@@ -14,9 +14,9 @@
    limitations under the License.
  */
 
+import { common } from '@kit.AbilityKit';
 import { AdComponent, advertising } from '@kit.AdsKit';
 import { window } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { AdStatus } from '../../constant/AdStatus';
 import { AdType } from '../../constant/AdType';
@@ -27,21 +27,18 @@ const TAG: string = 'Ads Demo-SplashAdPage';
 @ComponentV2
 export struct SplashAdPage {
   private viewModel: AdsViewModel = new AdsViewModel(this.getUIContext());
+  private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
 
   aboutToAppear() {
-    window.getLastWindow(this.getUIContext().getHostContext(), (err: BusinessError, win: window.Window) => {
-      // Set the screen to portrait.
-      win.setPreferredOrientation(window.Orientation.PORTRAIT);
-    });
+    // Set the screen to portrait.
+    this.setWindowPreferredOrientation(window.Orientation.PORTRAIT);
     const adRequestParams: advertising.AdRequestParams = this.viewModel.getParamsFromNav(AdType.SPLASH);
     this.viewModel.loadAd(adRequestParams);
   }
 
   aboutToDisappear() {
-    window.getLastWindow(this.getUIContext().getHostContext(), (err: BusinessError, win: window.Window) => {
-      // Set screen orientation to the default value. You can change the value based on the actual situation.
-      win.setPreferredOrientation(window.Orientation.UNSPECIFIED);
-    });
+    // Set screen orientation to the default value. You can change the value based on the actual situation.
+    this.setWindowPreferredOrientation(window.Orientation.UNSPECIFIED);
   }
 
   build() {
@@ -110,6 +107,10 @@ export struct SplashAdPage {
               hilog.info(0x0000, TAG, 'Status is onAdClose');
               this.viewModel.routeToHome();
               break;
+            case AdStatus.AD_FAIL:
+              hilog.info(0x0000, TAG, 'Status is onAdFail');
+              this.viewModel.routeToHome();
+              break;
           }
         }
       }
@@ -140,6 +141,10 @@ export struct SplashAdPage {
               hilog.info(0x0000, TAG, 'Status is onAdClose');
               this.viewModel.routeToHome();
               break;
+            case AdStatus.AD_FAIL:
+              hilog.info(0x0000, TAG, 'Status is onAdFail');
+              this.viewModel.routeToHome();
+              break;
           }
         }
       }
@@ -147,5 +152,14 @@ export struct SplashAdPage {
       .zIndex(1)
       .width('100%')
       .height('100%')
+  }
+
+  private async setWindowPreferredOrientation(orientation: Orientation): Promise<void> {
+    try {
+      const win: window.Window = await window.getLastWindow(this.context);
+      await win.setPreferredOrientation(orientation);
+    } catch (e) {
+      hilog.error(0x0000, 'testTag', `Failed to set preferred orientation. Code is ${e.code}, message is ${e.message}`);
+    }
   }
 }

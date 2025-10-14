@@ -17,7 +17,6 @@
 import { common } from '@kit.AbilityKit';
 import { AdComponent, advertising } from '@kit.AdsKit';
 import { window } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { AdStatus } from '../../constant/AdStatus';
 import { AdType } from '../../constant/AdType';
@@ -39,8 +38,12 @@ export struct RollAdPage {
   private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
 
   aboutToAppear() {
-    const countDownTextDesc = this.context.resourceManager.getStringSync($r('app.string.ad_free_for_VIP_members').id);
-    this.countDownTextPlaceholder = this.countDownTextPlaceholder.replace('%s', countDownTextDesc);
+    try {
+      const countDownTextDesc = this.context.resourceManager.getStringSync($r('app.string.ad_free_for_VIP_members').id);
+      this.countDownTextPlaceholder = this.countDownTextPlaceholder.replace('%s', countDownTextDesc);
+    } catch (e) {
+      hilog.error(0x0000, 'testTag', `Failed to get count down text. Code is ${e.code}, message is ${e.message}`);
+    }
     const adRequestParams = this.viewModel.getParamsFromNav(AdType.ROLL) as advertising.AdRequestParams;
     // Set the roll ad display duration.
     this.viewModel.adOptions.totalDuration = 30;
@@ -48,12 +51,10 @@ export struct RollAdPage {
   }
 
   aboutToDisappear(): void {
-    window.getLastWindow(this.getUIContext().getHostContext(), (err: BusinessError, win: window.Window) => {
-      // Set screen orientation to the default value. You can change the value based on the actual situation.
-      win.setPreferredOrientation(window.Orientation.UNSPECIFIED);
-      // Display the three-button navigation bar, status bar and bottom navigation bar. You can change the value based on the actual situation.
-      win.setWindowSystemBarEnable(['status', 'navigation']);
-    });
+    // Set screen orientation to the default value. You can change the value based on the actual situation.
+    this.setWindowPreferredOrientation(window.Orientation.UNSPECIFIED);
+    // Display the three-button navigation bar, status bar and bottom navigation bar. You can change the value based on the actual situation.
+    this.setWindowSystemBar(['status', 'navigation']);
   }
 
   build() {
@@ -67,24 +68,24 @@ export struct RollAdPage {
             interactionListener: {
               onStatusChanged: (status: string, ad: advertising.Advertisement, data: string) => {
                 switch (status) {
+                  case AdStatus.AD_FAIL:
+                    hilog.info(0x0000, TAG, 'Status is onAdFail');
+                    this.isPlayVideo = true;
+                    break;
                   case AdStatus.PORTRAIT:
                     hilog.info(0x0000, TAG, 'Status is onPortrait');
-                    window.getLastWindow(this.getUIContext().getHostContext(), (err: BusinessError, win) => {
-                      // Set the screen to portrait.
-                      win.setPreferredOrientation(window.Orientation.PORTRAIT);
-                      // Display the three-button navigation bar, status bar and bottom navigation bar.
-                      win.setWindowSystemBarEnable(['status', 'navigation']);
-                    });
+                    // Set the screen to portrait.
+                    this.setWindowPreferredOrientation(window.Orientation.PORTRAIT);
+                    // Display the three-button navigation bar, status bar and bottom navigation bar.
+                    this.setWindowSystemBar(['status', 'navigation']);
                     this.ratio = 16 / 9;
                     break;
                   case AdStatus.LANDSCAPE:
                     hilog.info(0x0000, TAG, 'Status is onLandscape');
-                    window.getLastWindow(this.getUIContext().getHostContext(), (err: BusinessError, win) => {
-                      // Set the screen to landscape.
-                      win.setPreferredOrientation(window.Orientation.LANDSCAPE);
-                      // Hide the three-button navigation bar, status bar and bottom navigation bar.
-                      win.setWindowSystemBarEnable([]);
-                    });
+                    // Set the screen to landscape.
+                    this.setWindowPreferredOrientation(window.Orientation.LANDSCAPE);
+                    // Hide the three-button navigation bar, status bar and bottom navigation bar.
+                    this.setWindowSystemBar([]);
                     this.ratio = -1;
                     break;
                   case AdStatus.MEDIA_PROGRESS:
@@ -111,14 +112,9 @@ export struct RollAdPage {
                     hilog.error(0x0000, TAG, 'Status is onMediaError');
                     break;
                   case AdStatus.MEDIA_COUNTDOWN:
-                    try {
-                      hilog.info(0x0000, TAG, 'Status is onMediaCountdown');
-                      const parseData: Record<string, number> = JSON.parse(JSON.stringify(data));
-                      this.countDownText = this.countDownTextPlaceholder.replace('%d', String(parseData.countdownTime));
-                    } catch (e) {
-                      hilog.error(0x0000, TAG,
-                        `Failed to parse data. Code is ${e.code}, message is ${e.message}`);
-                    }
+                    hilog.info(0x0000, TAG, 'Status is onMediaCountdown');
+                    const parseData: Record<string, Object> = this.safeParseData(data);
+                    this.countDownText = this.countDownTextPlaceholder.replace('%d', String(parseData.countdownTime));
                     break;
                   case AdStatus.BACK_CLICKED:
                     hilog.info(0x0000, TAG, 'Status is onBackClicked');
@@ -166,5 +162,35 @@ export struct RollAdPage {
       .aspectRatio(this.ratio)
     }
     .hideTitleBar(true)
+  }
+
+  private async setWindowPreferredOrientation(orientation: Orientation): Promise<void> {
+    try {
+      const win: window.Window = await window.getLastWindow(this.context);
+      await win.setPreferredOrientation(orientation);
+    } catch (e) {
+      hilog.error(0x0000, 'testTag', `Failed to set preferred orientation. Code is ${e.code}, message is ${e.message}`);
+    }
+  }
+
+  private async setWindowSystemBar(names: Array<'status' | 'navigation'>): Promise<void> {
+    try {
+      const win: window.Window = await window.getLastWindow(this.context);
+      await win.setWindowSystemBarEnable(names);
+    } catch (e) {
+      hilog.error(0x0000, 'testTag', `Failed to set window system bar. Code is ${e.code}, message is ${e.message}`);
+    }
+  }
+
+  private safeParseData(data: string): Record<string, Object> {
+    try {
+      if (typeof data === 'string') {
+        return JSON.parse(data);
+      }
+      return JSON.parse(JSON.stringify(data));
+    } catch (e) {
+      hilog.error(0x0000, 'testTag', `Failed to parse data. Code is ${e.code}, message is ${e.message}`);
+    }
+    return {};
   }
 }

@@ -55,6 +55,10 @@ export struct NativeAdPage {
                           hilog.info(0x0000, TAG, 'Status is onAdClose');
                           this.visibilityState = Visibility.None;
                           break;
+                        case AdStatus.AD_FAIL:
+                          hilog.info(0x0000, TAG, 'Status is onAdFail');
+                          this.visibilityState = Visibility.None;
+                          break;
                       }
                     }
                   }

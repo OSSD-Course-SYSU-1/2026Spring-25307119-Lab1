@@ -30,18 +30,7 @@ export class AdsViewModel {
   @Trace ads: advertising.Advertisement[] = [];
 
   // Ad configuration.
-  adOptions: advertising.AdOptions = {
-    // Whether you want your ad content to be treated as child-directed according to the regulations of COPPA.
-    tagForChildProtection: -1,
-    // Maximum ad content rating.
-    adContentClassification: 'A',
-    // Whether to request non-personalized ads.
-    nonPersonalizedAd: 0,
-    // Whether to allow ad asset download through mobile data.
-    allowMobileTraffic: 0,
-    // Whether you want the ad request to be processed in a way that is suitable for users in the European Economic Area (EEA) who are below the legal age of consent.
-    tagForUnderAgeOfPromise: -1
-  };
+  adOptions: advertising.AdOptions = {};
 
   // Ad display parameters.
   adDisplayOptions: advertising.AdDisplayOptions = {
@@ -86,15 +75,23 @@ export class AdsViewModel {
         if (adType === AdType.REWARD) {
           // Register a status listener for rewarded ads to monitor their playback status.
           new RewardAdStatusHandler().registerPPSReceiver();
-          // Call the API for displaying ads.
-          advertising.showAd(ads[0], this.adDisplayOptions, this.context);
+          try {
+            // Call the API for displaying ads.
+            advertising.showAd(ads[0], this.adDisplayOptions, this.context);
+          } catch (e) {
+            hilog.error(0x0000, 'testTag', `Failed to show ad. Code is ${e.code}, message is ${e.message}`);
+          }
           return;
         }
         if (adType === AdType.INTERSTITIAL) {
           // Register a status listener for interstitial ads to monitor their playback status.
           new InterstitialAdStatusHandler().registerPPSReceiver();
-          // Call the API for displaying ads.
-          advertising.showAd(ads[0], this.adDisplayOptions, this.context);
+          try {
+            // Call the API for displaying ads.
+            advertising.showAd(ads[0], this.adDisplayOptions, this.context);
+          } catch (e) {
+            hilog.error(0x0000, 'testTag', `Failed to show ad. Code is ${e.code}, message is ${e.message}`);
+          }
           return;
         }
         this.ads = ads;
@@ -102,8 +99,12 @@ export class AdsViewModel {
     };
     // Create an AdLoader ad object.
     const adLoader: advertising.AdLoader = new advertising.AdLoader(this.context);
-    // Call the API for requesting ads.
-    adLoader.loadAd(adRequestParams, this.adOptions, adLoadListener);
+    try {
+      // Call the API for requesting ads.
+      adLoader.loadAd(adRequestParams, this.adOptions, adLoadListener);
+    } catch (e) {
+      hilog.error(0x0000, 'testTag', `Failed to load ad. Code is ${e.code}, message is ${e.message}`);
+    }
   }
 
   async loadAdWithMultiSlots(adRequestParamsArray: advertising.AdRequestParams[]): Promise<void> {
@@ -121,8 +122,12 @@ export class AdsViewModel {
     };
     // Create an AdLoader ad object.
     const adLoader: advertising.AdLoader = new advertising.AdLoader(this.context);
-    // Call the API for requesting ads.
-    adLoader.loadAdWithMultiSlots(adRequestParamsArray, this.adOptions, multiSlotsAdLoaderListener);
+    try {
+      // Call the API for requesting ads.
+      adLoader.loadAdWithMultiSlots(adRequestParamsArray, this.adOptions, multiSlotsAdLoaderListener);
+    } catch (e) {
+      hilog.error(0x0000, 'testTag', `Failed to load multiSlots ad. Code is ${e.code}, message is ${e.message}`);
+    }
   }
 
   async routeToHome(): Promise<void> {
@@ -130,8 +135,8 @@ export class AdsViewModel {
       hilog.info(0x0000, TAG, 'Start to route to home');
       // You can change the target page for redirection based on the actual situation.
       this.navPathStack.clear();
-    } catch (err) {
-      hilog.error(0x0000, TAG, `Failed to route to home. Code is ${err.code}, message is ${err.message}`);
+    } catch (e) {
+      hilog.error(0x0000, TAG, `Failed to route to home. Code is ${e.code}, message is ${e.message}`);
     }
   }
 }

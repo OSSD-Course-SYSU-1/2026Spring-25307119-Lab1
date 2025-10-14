@@ -21,19 +21,19 @@ Before running this demo, you need to [configure app signing information](https:
 ## Preview
 
 | Home screen for various ad formats                  | Banner ad page                                   | Native video ad page                                   |
-|-----------------------------------------------------|--------------------------------------------------|--------------------------------------------------------|
+| --------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------ |
 | ![avatar](./screenshots/device_en/home_page_en.png) | ![avatar](./screenshots/device_en/banner_en.png) | ![avatar](./screenshots/device_en/native_video_en.png) |
 
 | Native large image ad page                                   | Native small image ad page                                   | Native three-image ad page                                   |
-|--------------------------------------------------------------|--------------------------------------------------------------|--------------------------------------------------------------|
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | ![avatar](./screenshots/device_en/native_large_image_en.png) | ![avatar](./screenshots/device_en/native_small_image_en.png) | ![avatar](./screenshots/device_en/native_three_image_en.png) |
 
-| Rewarded ad page                                 | Interstitial video ad page                                   | Interstitial image ad page                                      |
-|--------------------------------------------------|--------------------------------------------------------------|-----------------------------------------------------------------|
+| Rewarded ad page                                 | Interstitial video ad page                                   | Interstitial image ad page                                   |
+| ------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | ![avatar](./screenshots/device_en/reward_en.png) | ![avatar](./screenshots/device_en/interstitial_video_en.png) | ![avatar](./screenshots/device_en/interstitial_pictures_en.png) |
 
 | Splash video ad page                                   | Splash image ad page                                      | Roll ad page                                   |
-|--------------------------------------------------------|-----------------------------------------------------------|------------------------------------------------|
+| ------------------------------------------------------ | --------------------------------------------------------- | ---------------------------------------------- |
 | ![avatar](./screenshots/device_en/splash_video_en.png) | ![avatar](./screenshots/device_en/splash_pictures_en.png) | ![avatar](./screenshots/device_en/roll_en.png) |
 
 ## Project Directory
@@ -49,7 +49,7 @@ Before running this demo, you need to [configure app signing information](https:
 │ │ ├─InterstitialAdStatusHandler.ets // Class for subscribing to interstitial ad events.
 │ │ ├─RewardAdStatusHandler.ets       // Class for subscribing to rewarded ad events.
 │ │ └─TimeOutHandler.ets              // Timeout handler class.
-│ ├─pages                             // Directory for storing app UI files.
+│ ├─pages                             // Directory for storing app UI files.               
 │ │ ├─Index.ets                       // App home screen.
 │ │ └─ads
 │ │   ├─BannerAdPage.ets              // Banner ad page.
@@ -99,6 +99,7 @@ The sample code includes the following files for you to request and display ads:
 ## Required Permissions
 
 - To obtain the OAID, you need to request the activity tracking permission [ohos.permission.APP_TRACKING_CONSENT](https://developer.huawei.com/consumer/en/doc/harmonyos-guides/permissions-for-all-user#ohospermissionapp_tracking_consent).
+- To request and display ads, you need to request the Internet permission [ohos.permission.INTERNET](https://developer.huawei.com/consumer/en/doc/harmonyos-guides/permissions-for-all#ohospermissioninternet).
 
 ## Constraints
 
