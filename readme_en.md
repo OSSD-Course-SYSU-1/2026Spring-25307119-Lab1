@@ -1,4 +1,4 @@
-# Ads Kit Sample Code (HarmonyOS ArkTS)
+# Ads Kit
 
 ## Contents
 
