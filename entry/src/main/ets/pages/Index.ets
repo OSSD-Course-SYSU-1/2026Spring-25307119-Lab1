@@ -1,17 +1,16 @@
 /*
  * Copyright 2023. Huawei Technologies Co., Ltd. All rights reserved.
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import { abilityAccessCtrl, common, PermissionRequestResult } from '@kit.AbilityKit';
@@ -37,7 +36,12 @@ struct Index {
 
   async aboutToAppear() {
     const oaid = await requestOAID(this.context);
-    // Banner Ad.
+
+    // 优化：OAID 为空时增加保护，避免广告加载失败
+    if (!oaid) {
+      hilog.warn(0x0000, TAG, "OAID is null, some ads may not work properly");
+    }
+
     this.buttonsOptions.push({
       text: $r('app.string.request_banner_ad_btn'),
       adRequestParams: {
@@ -48,7 +52,7 @@ struct Index {
         oaid: oaid
       }
     });
-    // Native video ad.
+
     this.buttonsOptions.push({
       text: $r('app.string.request_native_video_ad_btn'),
       adRequestParams: {
@@ -59,7 +63,7 @@ struct Index {
         oaid: oaid
       }
     });
-    // Native large image ad.
+
     this.buttonsOptions.push({
       text: $r('app.string.request_native_large_image_ad_btn'),
       adRequestParams: {
@@ -70,7 +74,7 @@ struct Index {
         oaid: oaid
       }
     });
-    // Native small image ad.
+
     this.buttonsOptions.push({
       text: $r('app.string.request_native_small_image_ad_btn'),
       adRequestParams: {
@@ -81,7 +85,7 @@ struct Index {
         oaid: oaid
       }
     });
-    // Native three-image ad.
+
     this.buttonsOptions.push({
       text: $r('app.string.request_native_three_image_ad_btn'),
       adRequestParams: {
@@ -92,7 +96,7 @@ struct Index {
         oaid: oaid
       }
     });
-    // Rewarded ad.
+
     this.buttonsOptions.push({
       text: $r('app.string.request_reward_ad_btn'),
       shouldShowAd: true,
@@ -102,7 +106,7 @@ struct Index {
         oaid: oaid
       }
     });
-    // Interstitial video ad.
+
     this.buttonsOptions.push({
       text: $r('app.string.request_interstitial_video_ad_btn'),
       shouldShowAd: true,
@@ -112,7 +116,7 @@ struct Index {
         oaid: oaid
       }
     });
-    // Interstitial image ad.
+
     this.buttonsOptions.push({
       text: $r('app.string.request_interstitial_image_ad_btn'),
       shouldShowAd: true,
@@ -122,7 +126,7 @@ struct Index {
         oaid: oaid
       }
     });
-    // Splash video ad.
+
     this.buttonsOptions.push({
       text: $r('app.string.request_splash_video_ad_btn'),
       adRequestParams: {
@@ -132,7 +136,7 @@ struct Index {
         oaid: oaid
       }
     });
-    // Splash image ad.
+
     this.buttonsOptions.push({
       text: $r('app.string.request_splash_image_ad_btn'),
       adRequestParams: {
@@ -142,7 +146,7 @@ struct Index {
         oaid: oaid
       }
     });
-    // Roll ad.
+
     this.buttonsOptions.push({
       text: $r('app.string.request_roll_ad_btn'),
       adRequestParams: {
@@ -166,13 +170,16 @@ struct Index {
                 .width('90%')
                 .margin({ top: 10, bottom: 10 })
                 .onClick(() => {
-                  const options: ButtonOptions = repeatItem.item;
-                  if (options.shouldShowAd) {
+                  const options = repeatItem.item;
+                  // 优化：增加空值保护，防止点击崩溃
+                  if (!options) return;
+
+                  if (options.shouldShowAd && options.adRequestParams) {
                     this.viewModel.loadAd(options.adRequestParams);
                     return;
                   }
                   if (options.adRequestParams?.adType) {
-                    this.navPathStack.pushPathByName(AdType[options.adRequestParams?.adType], options.adRequestParams);
+                    this.navPathStack.pushPathByName(AdType[options.adRequestParams.adType], options.adRequestParams);
                   }
                 })
             }
@@ -213,26 +220,30 @@ interface ButtonOptions {
 }
 
 async function requestOAID(context: Context): Promise<string | undefined> {
-  let isPermissionGranted: boolean = false;
+  let isPermissionGranted = false;
+
   try {
-    const atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
-    const result: PermissionRequestResult =
-      await atManager.requestPermissionsFromUser(context, ['ohos.permission.APP_TRACKING_CONSENT']);
+    const atManager = abilityAccessCtrl.createAtManager();
+    const result: PermissionRequestResult = await atManager.requestPermissionsFromUser(context, [
+      'ohos.permission.APP_TRACKING_CONSENT'
+    ]);
     isPermissionGranted = result.authResults[0] === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED;
   } catch (err) {
-    hilog.error(0x0000, TAG, `Failed to request permission. Code is ${err.code}, message is ${err.message}`);
+    hilog.error(0x0000, TAG, `request permission error: ${err.message}`);
+    return undefined;
   }
-  if (isPermissionGranted) {
-    hilog.info(0x0000, TAG, 'Succeeded in requesting permission');
-    try {
-      const oaid = await identifier.getOAID();
-      hilog.info(0x0000, TAG, 'Succeeded in getting OAID');
-      return oaid;
-    } catch (err) {
-      hilog.error(0x0000, TAG, `Failed to get OAID. Code is ${err.code}, message is ${err.message}`);
-    }
-  } else {
-    hilog.error(0x0000, TAG, 'Failed to request permission. User rejected');
+
+  if (!isPermissionGranted) {
+    hilog.error(0x0000, TAG, "Permission denied, cannot get OAID");
+    return undefined;
   }
-  return undefined;
+
+  try {
+    const oaid = await identifier.getOAID();
+    hilog.info(0x0000, TAG, "OAID obtained successfully");
+    return oaid;
+  } catch (err) {
+    hilog.error(0x0000, TAG, `get OAID error: ${err.message}`);
+    return undefined;
+  }
 }

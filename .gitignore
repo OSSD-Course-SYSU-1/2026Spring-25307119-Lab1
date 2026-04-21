@@ -1,0 +1,10 @@
+.idea/
+.ohos/
+build/
+dist/
+oh_modules/
+local.properties
+*.log
+*.iml
+.DS_Store
+cache/
