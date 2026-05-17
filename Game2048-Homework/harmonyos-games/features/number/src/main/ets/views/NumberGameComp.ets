@@ -15,6 +15,7 @@ export struct NumberGameComp {
   @State board: Board = new Board();
   @State score: number = 0;
   @State bestScore: number = 0;
+  @State stepCount: number = 0;
   @State gridMap: number[][] = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]
   @State boardCellsArray: Tile[][] = [];
   @State screenStartX: number = 0
@@ -26,21 +27,39 @@ export struct NumberGameComp {
   build() {
     Column({ space: 16 }) {
       HdNav({ title: '2048', showRightIcon: false })
-      Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceEvenly }) {
-        Button($r('app.string.n_new_game'))
-          .type(ButtonType.Normal)
-          .width('30%')
-          .height(50)
-          .backgroundColor($r('app.color.n_cm_bg_color'))
-          .fontColor($r('app.color.n_font_color'))
-          .borderRadius(7)
-          .onClick(() => {
-            this.reset()
-          })
-        this.infoBuilder({ info: $r('app.string.n_points'), text: this.score + '' })
-        this.infoBuilder({ info: $r('app.string.n_best'), text: this.bestScore + '' })
+      Column({ space: 10 }) {
+        Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceEvenly }) {
+          Button($r('app.string.n_new_game'))
+            .type(ButtonType.Normal)
+            .width('42%')
+            .height(50)
+            .backgroundColor($r('app.color.n_cm_bg_color'))
+            .fontColor($r('app.color.n_font_color'))
+            .borderRadius(7)
+            .onClick(() => {
+              this.reset()
+            })
+          Button('游戏说明')
+            .type(ButtonType.Normal)
+            .width('42%')
+            .height(50)
+            .backgroundColor($r('app.color.n_cm_bg_color'))
+            .fontColor($r('app.color.n_font_color'))
+            .borderRadius(7)
+            .onClick(() => {
+              this.showGameRules()
+            })
+        }
+        .width('100%')
+
+        Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceEvenly }) {
+          this.infoBuilder({ info: $r('app.string.n_points'), text: this.score + '' })
+          this.infoBuilder({ info: $r('app.string.n_best'), text: this.bestScore + '' })
+          this.infoBuilder({ info: '步数', text: this.stepCount + '' })
+        }
+        .width('100%')
       }
-      .height(70)
+      .height(120)
       .width('90%')
       .padding(10)
 
@@ -91,6 +110,7 @@ export struct NumberGameComp {
     // 获取最佳得分
     this.preferencesUtil.getPreference(PREFERENCES_KEY).then(resultData => {
       console.log('PREFERENCES_KEY', resultData)
+      this.bestScore = this.parsePreferenceNumber(resultData)
     });
   }
 
@@ -98,6 +118,7 @@ export struct NumberGameComp {
     this.board = new Board();
     this.boardCellsArray = this.board.cells;
     this.score = this.board.score
+    this.stepCount = 0
     this.lost = false;
     this.won = false;
   }
@@ -128,35 +149,91 @@ export struct NumberGameComp {
     .gesture(GestureGroup(GestureMode.Exclusive,
       PanGesture({ direction: PanDirection.Left }).onActionEnd(() => {
         console.info("Left")
-        this.boardCellsArray = this.board.move(0).cells
-        this.updateGameStatus(this.board)
+        this.handleMove(0)
       }),
       PanGesture({ direction: PanDirection.Right }).onActionEnd(() => {
         console.info("Right")
-        this.boardCellsArray = this.board.move(2).cells
-        this.updateGameStatus(this.board)
+        this.handleMove(2)
       }),
       PanGesture({ direction: PanDirection.Up }).onActionEnd(() => {
         console.info("Up")
-        this.boardCellsArray = this.board.move(1).cells
-        this.updateGameStatus(this.board)
+        this.handleMove(1)
       }),
       PanGesture({ direction: PanDirection.Down }).onActionEnd(() => {
         console.info("Down")
-        this.boardCellsArray = this.board.move(3).cells
-        this.updateGameStatus(this.board)
+        this.handleMove(3)
       })
     ))
   }
 
+  handleMove(direction: number): void {
+    const beforeValues: number[][] = this.getBoardValues(this.board.cells)
+    this.boardCellsArray = this.board.move(direction).cells
+    if (this.isBoardChanged(beforeValues, this.boardCellsArray)) {
+      this.stepCount += 1
+    }
+    this.updateGameStatus(this.board)
+  }
+
   updateGameStatus(board: Board): void {
     this.score = board.score
+    if (this.score > this.bestScore) {
+      this.bestScore = this.score
+      this.saveBestScore()
+    }
     if (board.hasLost()) {
       this.lost = true
     }
     if (board.hasWon()) {
       this.won = true
     }
+  }
+
+  getBoardValues(cells: Tile[][]): number[][] {
+    let values: number[][] = []
+    for (let rowIndex = 0; rowIndex < cells.length; rowIndex++) {
+      let rowValues: number[] = []
+      for (let columnIndex = 0; columnIndex < cells[rowIndex].length; columnIndex++) {
+        rowValues.push(cells[rowIndex][columnIndex].value)
+      }
+      values.push(rowValues)
+    }
+    return values
+  }
+
+  isBoardChanged(beforeValues: number[][], afterCells: Tile[][]): boolean {
+    for (let rowIndex = 0; rowIndex < afterCells.length; rowIndex++) {
+      for (let columnIndex = 0; columnIndex < afterCells[rowIndex].length; columnIndex++) {
+        if (beforeValues[rowIndex][columnIndex] !== afterCells[rowIndex][columnIndex].value) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
+  parsePreferenceNumber(value: Object): number {
+    const parsedValue = Number(value)
+    if (Number.isNaN(parsedValue)) {
+      return 0
+    }
+    return parsedValue
+  }
+
+  async saveBestScore() {
+    await this.preferencesUtil.putPreference(PREFERENCES_KEY, this.bestScore)
+  }
+
+  showGameRules() {
+    AlertDialog.show({
+      title: '游戏说明',
+      message: '上下左右滑动棋盘移动所有数字方块。相同数字的方块相撞时会合并成它们的和，并计入当前分数。每次有效滑动会增加一步。合成 2048 即获胜；棋盘填满且无法继续合并时游戏结束。',
+      primaryButton: {
+        value: '知道了',
+        action: () => {
+        }
+      }
+    })
   }
 
   @Builder
