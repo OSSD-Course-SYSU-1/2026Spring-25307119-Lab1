@@ -12,5 +12,7 @@ struct ProjectPage {
     Column() {
       NumberGameComp()
     }
+    .width('100%')
+    .height('100%')
   }
 }

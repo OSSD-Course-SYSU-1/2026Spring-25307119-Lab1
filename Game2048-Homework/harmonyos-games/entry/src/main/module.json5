@@ -22,6 +22,10 @@
         "startWindowIcon": "$media:startIcon",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
+        "continuable": true,
+        "continueType": [
+          "game2048"
+        ],
         "skills": [
           {
             "entities": [

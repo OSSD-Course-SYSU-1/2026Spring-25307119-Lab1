@@ -1,13 +1,29 @@
 import { HdNav } from '@mygames/basic'
 import { Board, Tile } from '../services/helper'
-import { HashMap } from '@kit.ArkTS'; // 导入HashMap模块
+import { HashMap } from '@kit.ArkTS';
 import PreferencesUtil from '../services/PreferencesUtil';
+import GameStateStore, { GameSnapshot, GAME_SNAPSHOT_VERSION } from '../services/GameStateStore';
 
 interface InfoBuilderParams {
   info: string | Resource
   text: string
+  width: string
 }
+
+interface ActionButtonParams {
+  text: string | Resource
+  width: string
+  action: () => void
+}
+
 const PREFERENCES_KEY = 'number_best_score';
+const WIDE_SCREEN_BREAKPOINT = 600;
+const PHONE_CONTENT_WIDTH_RATIO = 0.9;
+const WIDE_BOARD_WIDTH_RATIO = 0.52;
+const WIDE_BOARD_HEIGHT_RATIO = 0.86;
+const WIDE_BOARD_MAX_SIZE = 520;
+const DEFAULT_BOARD_SIZE = 320;
+
 @Component
 export struct NumberGameComp {
   @State won: boolean = false;
@@ -16,68 +32,129 @@ export struct NumberGameComp {
   @State score: number = 0;
   @State bestScore: number = 0;
   @State stepCount: number = 0;
-  @State gridMap: number[][] = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]
   @State boardCellsArray: Tile[][] = [];
-  @State screenStartX: number = 0
-  @State screenStartY: number = 0
-  @State lastScreenX: number = 0
-  @State lastScreenY: number = 0
+  @State contentWidth: number = 0;
+  @State contentHeight: number = 0;
   @State imageHashMap: HashMap<string, Resource> = new HashMap();
   private preferencesUtil = new PreferencesUtil();
+
   build() {
-    Column({ space: 16 }) {
-      HdNav({ title: '2048', showRightIcon: false })
-      Column({ space: 10 }) {
-        Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceEvenly }) {
-          Button($r('app.string.n_new_game'))
-            .type(ButtonType.Normal)
-            .width('42%')
-            .height(50)
-            .backgroundColor($r('app.color.n_cm_bg_color'))
-            .fontColor($r('app.color.n_font_color'))
-            .borderRadius(7)
-            .onClick(() => {
-              this.reset()
-            })
-          Button('游戏说明')
-            .type(ButtonType.Normal)
-            .width('42%')
-            .height(50)
-            .backgroundColor($r('app.color.n_cm_bg_color'))
-            .fontColor($r('app.color.n_font_color'))
-            .borderRadius(7)
-            .onClick(() => {
-              this.showGameRules()
-            })
-        }
-        .width('100%')
-
-        Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceEvenly }) {
-          this.infoBuilder({ info: $r('app.string.n_points'), text: this.score + '' })
-          this.infoBuilder({ info: $r('app.string.n_best'), text: this.bestScore + '' })
-          this.infoBuilder({ info: '步数', text: this.stepCount + '' })
-        }
-        .width('100%')
-      }
-      .height(120)
-      .width('90%')
-      .padding(10)
-
-      if (this.lost) {
-        Image($r('app.media.game_over')).width('90%')
-      } else if (this.won) {
-        Image($r('app.media.2048')).width('90%')
+    Column() {
+      if (this.isWideScreen()) {
+        this.wideLayoutBuilder()
       } else {
-        this.gridBuilder()
+        this.phoneLayoutBuilder()
       }
     }
+    .width('100%')
+    .height('100%')
     .linearGradient({
       direction: GradientDirection.Right,
       repeating: false,
       colors: [['#ff453ba7', 0.0], ['#ff56319b', 0.47], ['#ff5431b5', 1.0]]
     })
-    .height('100%')
+    .onAreaChange((_oldValue: Area, newValue: Area) => {
+      this.updateContentSize(newValue.width, newValue.height)
+    })
+    .onVisibleAreaChange([0.0, 1.0], (isVisible: boolean, _currentRatio: number) => {
+      if (isVisible) {
+        this.restorePendingSnapshotIfNeeded()
+      }
+    })
+  }
 
+  @Builder
+  phoneLayoutBuilder() {
+    Scroll() {
+      Column({ space: 10 }) {
+        HdNav({ title: '2048', showRightIcon: false })
+        this.actionsBuilder(false)
+        this.infoRowBuilder('90%')
+        this.boardBuilder()
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Center)
+      .padding({ bottom: 16 })
+    }
+    .width('100%')
+    .height('100%')
+    .scrollable(ScrollDirection.Vertical)
+  }
+
+  @Builder
+  wideLayoutBuilder() {
+    Row({ space: 28 }) {
+      Column() {
+        this.boardBuilder()
+      }
+      .width('58%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
+      .alignItems(HorizontalAlign.Center)
+
+      Scroll() {
+        Column({ space: 14 }) {
+          Text('2048')
+            .fontSize(34)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r('app.color.common_gray_01'))
+          this.actionsBuilder(true)
+          this.infoRowBuilder('100%')
+        }
+        .width('100%')
+        .justifyContent(FlexAlign.Center)
+        .alignItems(HorizontalAlign.Center)
+      }
+      .width('34%')
+      .constraintSize({ maxWidth: 420 })
+      .height('100%')
+      .scrollable(ScrollDirection.Vertical)
+    }
+    .width('92%')
+    .height('100%')
+    .alignItems(VerticalAlign.Center)
+    .justifyContent(FlexAlign.Center)
+  }
+
+  @Builder
+  actionsBuilder(isWide: boolean) {
+    Column({ space: 10 }) {
+      Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceBetween }) {
+        this.actionButton({ text: $r('app.string.n_new_game'), width: '48%', action: (): void => this.reset() })
+        this.actionButton({ text: '游戏说明', width: '48%', action: (): void => this.showGameRules() })
+      }
+      .width('100%')
+
+      Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceBetween }) {
+        this.actionButton({ text: '保存模拟快照', width: '48%', action: (): void => this.saveSimulationSnapshot() })
+        this.actionButton({ text: '恢复模拟快照', width: '48%', action: (): void => this.restoreSimulationSnapshot() })
+      }
+      .width('100%')
+    }
+    .width(isWide ? '100%' : '90%')
+  }
+
+  @Builder
+  actionButton(params: ActionButtonParams) {
+    Button(params.text)
+      .type(ButtonType.Normal)
+      .width(params.width)
+      .height(46)
+      .backgroundColor($r('app.color.n_cm_bg_color'))
+      .fontColor($r('app.color.n_font_color'))
+      .borderRadius(7)
+      .fontSize(14)
+      .onClick(params.action)
+  }
+
+  @Builder
+  infoRowBuilder(containerWidth: string) {
+    Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceEvenly }) {
+      this.infoBuilder({ info: $r('app.string.n_points'), text: this.score.toString(), width: '30%' })
+      this.infoBuilder({ info: $r('app.string.n_best'), text: this.bestScore.toString(), width: '30%' })
+      this.infoBuilder({ info: '步数', text: this.stepCount.toString(), width: '30%' })
+    }
+    .width(containerWidth)
   }
 
   @Builder
@@ -95,23 +172,44 @@ export struct NumberGameComp {
       Text(params.text)
         .fontSize(20)
         .fontColor($r('app.color.common_gray_01'))
-    }.width('30%').height(50).backgroundColor($r('app.color.n_cm_bg_color'))
+    }
+    .width(params.width)
+    .height(50)
+    .backgroundColor($r('app.color.n_cm_bg_color'))
     .borderRadius(7)
   }
 
+  @Builder
+  boardBuilder() {
+    Column() {
+      if (this.lost) {
+        Image($r('app.media.game_over'))
+          .width('100%')
+          .height('100%')
+          .objectFit(ImageFit.Contain)
+      } else if (this.won) {
+        Image($r('app.media.2048'))
+          .width('100%')
+          .height('100%')
+          .objectFit(ImageFit.Contain)
+      } else {
+        this.gridBuilder()
+      }
+    }
+    .width(this.getBoardSize())
+    .height(this.getBoardSize())
+  }
+
   async aboutToAppear() {
-    console.log("aboutToAppear")
     this.initImageHashMap()
     this.boardCellsArray = this.board.cells;
-    console.log(JSON.stringify(this.boardCellsArray))
-    // 初始化首选项
     await this.preferencesUtil.getPreferencesFromStorage();
 
-    // 获取最佳得分
-    this.preferencesUtil.getPreference(PREFERENCES_KEY).then(resultData => {
-      console.log('PREFERENCES_KEY', resultData)
-      this.bestScore = this.parsePreferenceNumber(resultData)
-    });
+    const resultData = await this.preferencesUtil.getPreference(PREFERENCES_KEY);
+    this.bestScore = this.parsePreferenceNumber(resultData)
+    if (!this.restorePendingSnapshotIfNeeded()) {
+      this.publishSnapshot()
+    }
   }
 
   reset() {
@@ -121,6 +219,7 @@ export struct NumberGameComp {
     this.stepCount = 0
     this.lost = false;
     this.won = false;
+    this.publishSnapshot()
   }
 
   @Builder
@@ -143,24 +242,20 @@ export struct NumberGameComp {
     .maxCount(4)
     .columnsTemplate('1fr 1fr 1fr 1fr')
     .rowsTemplate('1fr 1fr 1fr 1fr')
-    .width('90%')
-    .height('43%')
+    .width('100%')
+    .height('100%')
     .layoutDirection(GridDirection.Row)
     .gesture(GestureGroup(GestureMode.Exclusive,
       PanGesture({ direction: PanDirection.Left }).onActionEnd(() => {
-        console.info("Left")
         this.handleMove(0)
       }),
       PanGesture({ direction: PanDirection.Right }).onActionEnd(() => {
-        console.info("Right")
         this.handleMove(2)
       }),
       PanGesture({ direction: PanDirection.Up }).onActionEnd(() => {
-        console.info("Up")
         this.handleMove(1)
       }),
       PanGesture({ direction: PanDirection.Down }).onActionEnd(() => {
-        console.info("Down")
         this.handleMove(3)
       })
     ))
@@ -169,10 +264,14 @@ export struct NumberGameComp {
   handleMove(direction: number): void {
     const beforeValues: number[][] = this.getBoardValues(this.board.cells)
     this.boardCellsArray = this.board.move(direction).cells
-    if (this.isBoardChanged(beforeValues, this.boardCellsArray)) {
+    const moved = this.isBoardChanged(beforeValues, this.boardCellsArray)
+    if (moved) {
       this.stepCount += 1
     }
     this.updateGameStatus(this.board)
+    if (moved) {
+      this.publishSnapshot()
+    }
   }
 
   updateGameStatus(board: Board): void {
@@ -236,14 +335,119 @@ export struct NumberGameComp {
     })
   }
 
+  saveSimulationSnapshot(): void {
+    this.publishSnapshot()
+    if (GameStateStore.saveSimulationSnapshot()) {
+      this.showMessage('模拟快照', '模拟快照已保存')
+    } else {
+      this.showMessage('模拟快照', '当前没有可保存的模拟快照。')
+    }
+  }
+
+  restoreSimulationSnapshot(): void {
+    if (!GameStateStore.prepareSimulationRestore()) {
+      this.showMessage('模拟快照', '暂无可恢复的模拟快照')
+      return;
+    }
+
+    if (this.restorePendingSnapshotIfNeeded()) {
+      this.showMessage('模拟快照', '模拟快照已恢复')
+    } else {
+      this.showMessage('模拟快照', '模拟快照无效，未恢复。')
+    }
+  }
+
+  showMessage(title: string, message: string): void {
+    AlertDialog.show({
+      title: title,
+      message: message,
+      primaryButton: {
+        value: '知道了',
+        action: () => {
+        }
+      }
+    })
+  }
+
+  restorePendingSnapshotIfNeeded(): boolean {
+    const pendingSnapshot = GameStateStore.consumePendingSnapshot()
+    if (pendingSnapshot === undefined) {
+      return false;
+    }
+    return this.restoreSnapshot(pendingSnapshot)
+  }
+
+  restoreSnapshot(snapshot: GameSnapshot): boolean {
+    if (!this.board.restoreFromValues(snapshot.cells, snapshot.score, snapshot.won)) {
+      return false;
+    }
+
+    this.boardCellsArray = this.board.cells;
+    this.score = snapshot.score;
+    this.stepCount = snapshot.stepCount;
+    this.bestScore = snapshot.bestScore;
+    this.won = snapshot.won;
+    this.lost = snapshot.lost;
+    this.saveBestScore()
+    this.publishSnapshot()
+    return true;
+  }
+
+  publishSnapshot(): void {
+    const snapshot: GameSnapshot = {
+      version: GAME_SNAPSHOT_VERSION,
+      cells: this.board.exportCellValues(),
+      score: this.score,
+      stepCount: this.stepCount,
+      bestScore: this.bestScore,
+      won: this.won,
+      lost: this.lost
+    };
+    GameStateStore.setLatestSnapshot(snapshot)
+  }
+
+  isWideScreen(): boolean {
+    return this.contentWidth >= WIDE_SCREEN_BREAKPOINT;
+  }
+
+  getBoardSize(): number {
+    if (this.isWideScreen()) {
+      const widthSize = this.contentWidth > 0 ? this.contentWidth * WIDE_BOARD_WIDTH_RATIO : DEFAULT_BOARD_SIZE;
+      const heightSize = this.contentHeight > 0 ? this.contentHeight * WIDE_BOARD_HEIGHT_RATIO : DEFAULT_BOARD_SIZE;
+      return Math.max(1, Math.min(widthSize, heightSize, WIDE_BOARD_MAX_SIZE));
+    }
+
+    if (this.contentWidth > 0) {
+      return Math.max(1, this.contentWidth * PHONE_CONTENT_WIDTH_RATIO);
+    }
+    return DEFAULT_BOARD_SIZE;
+  }
+
+  updateContentSize(width: Length, height: Length): void {
+    this.contentWidth = this.parseLength(width);
+    this.contentHeight = this.parseLength(height);
+  }
+
+  parseLength(value: Length): number {
+    const parsedValue = Number(value);
+    if (Number.isFinite(parsedValue)) {
+      return parsedValue;
+    }
+
+    const fallbackValue = parseFloat(value.toString());
+    return Number.isFinite(fallbackValue) ? fallbackValue : 0;
+  }
+
   @Builder
   tileBuilder(params: Tile) {
     GridItem() {
       if (params.value > 0) {
         Image(this.getImageResource(params.value))
+          .width('100%')
+          .height('100%')
       }
-    }.backgroundColor("#ff564a86")
-
+    }
+    .backgroundColor("#ff564a86")
   }
 
   getImageResource(value: number) {

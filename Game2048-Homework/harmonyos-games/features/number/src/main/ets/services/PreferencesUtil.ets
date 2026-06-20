@@ -24,7 +24,7 @@ export default class PreferencesUtil {
   }
 
   // 将用户输入的数据，保存到缓存的Preference实例中
-  async putPreference(key: string, data: string) {
+  async putPreference(key: string, data: dataPreferences.ValueType) {
     if (this.preferences === null) {
       await this.getPreferencesFromStorage();
     }

@@ -83,7 +83,7 @@ class Board {
   deltaY: number[];
   won: boolean;
 
-  constructor() {
+  constructor(cellValues?: number[], score?: number, won?: boolean) {
     this.tiles = [];
     this.cells = [];
     this.score = 0;
@@ -91,6 +91,12 @@ class Board {
     this.fourProbability = 0.1;
     this.deltaX = [-1, 0, 1, 0];
     this.deltaY = [0, -1, 0, 1];
+    this.won = false;
+
+    if (cellValues !== undefined && this.restoreFromValues(cellValues, score, won)) {
+      return;
+    }
+
     for (let i = 0; i < this.size; ++i) {
       this.cells[i] = [
         this.addTile(),
@@ -102,7 +108,6 @@ class Board {
     this.addRandomTile();
     this.addRandomTile();
     this.setPositions();
-    this.won = false;
   }
 
   addTile(args?: number) {
@@ -166,10 +171,58 @@ class Board {
         }
       }
     }
+    if (emptyCells.length === 0) {
+      return;
+    }
     let index = ~~(Math.random() * emptyCells.length);
     let cell = emptyCells[index];
     let newValue = Math.random() < this.fourProbability ? 4 : 2;
     this.cells[cell.r][cell.c] = this.addTile(newValue);
+  }
+
+  exportCellValues(): number[] {
+    let values: number[] = [];
+    for (let row = 0; row < this.size; row++) {
+      for (let column = 0; column < this.size; column++) {
+        values.push(this.cells[row][column].value);
+      }
+    }
+    return values;
+  }
+
+  restoreFromValues(cellValues: number[], score?: number, won?: boolean): boolean {
+    if (!this.isValidCellValues(cellValues)) {
+      return false;
+    }
+    if (score !== undefined && (!Number.isFinite(score) || score < 0)) {
+      return false;
+    }
+
+    this.tiles = [];
+    this.cells = [];
+    for (let row = 0; row < this.size; row++) {
+      this.cells[row] = [];
+      for (let column = 0; column < this.size; column++) {
+        this.cells[row][column] = this.addTile(cellValues[row * this.size + column]);
+      }
+    }
+    this.score = score === undefined ? 0 : score;
+    this.won = won === undefined ? false : won;
+    this.setPositions();
+    return true;
+  }
+
+  private isValidCellValues(cellValues: number[]): boolean {
+    if (cellValues.length !== this.size * this.size) {
+      return false;
+    }
+
+    for (let index = 0; index < cellValues.length; index++) {
+      if (!Number.isFinite(cellValues[index]) || cellValues[index] < 0) {
+        return false;
+      }
+    }
+    return true;
   }
 
   move(direction: number) {
