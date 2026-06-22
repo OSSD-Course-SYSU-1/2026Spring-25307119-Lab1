@@ -2,15 +2,43 @@
   "color": [
     {
       "name": "start_window_background",
-      "value": "#FFFFFF"
+      "value": "#F5F2FA"
     },
     {
       "name": "n_cm_bg_color",
-      "value": "#3d2963"
+      "value": "#FFFFFF"
     },
     {
       "name": "n_font_color",
-      "value": "#ffff"
+      "value": "#2B2435"
+    },
+    {
+      "name": "n_page_bg",
+      "value": "#F5F2FA"
+    },
+    {
+      "name": "n_primary",
+      "value": "#6C4CCF"
+    },
+    {
+      "name": "n_primary_dark",
+      "value": "#49318C"
+    },
+    {
+      "name": "n_secondary_text",
+      "value": "#7A7485"
+    },
+    {
+      "name": "n_card_border",
+      "value": "#E7E0F2"
+    },
+    {
+      "name": "n_board_bg",
+      "value": "#D8D1E2"
+    },
+    {
+      "name": "n_empty_cell",
+      "value": "#C8C0D4"
     }
   ]
 }

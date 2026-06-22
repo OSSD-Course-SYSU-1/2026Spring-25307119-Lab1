@@ -1,3 +1,5 @@
+import { GameMode, MOVE_LIMIT_TOTAL_MOVES, TIMED_TOTAL_SECONDS, sanitizeGameMode } from './GameModels';
+
 export interface GameSnapshot {
   version: number
   cells: number[]
@@ -6,9 +8,14 @@ export interface GameSnapshot {
   bestScore: number
   won: boolean
   lost: boolean
+  mode: GameMode
+  remainingSeconds: number
+  remainingMoves: number
+  gameEnded: boolean
+  timerStartedAt: number
 }
 
-export const GAME_SNAPSHOT_VERSION: number = 1;
+export const GAME_SNAPSHOT_VERSION: number = 2;
 export const GAME_SNAPSHOT_PARAM_KEY: string = 'game2048Snapshot';
 
 class GameStateStoreImpl {
@@ -95,20 +102,21 @@ class GameStateStoreImpl {
 
   private validateSnapshot(snapshot: GameSnapshot): GameSnapshot | undefined {
     return this.validateSnapshotValues(snapshot.version, snapshot.cells, snapshot.score, snapshot.stepCount,
-      snapshot.bestScore, snapshot.won, snapshot.lost);
+      snapshot.bestScore, snapshot.won, snapshot.lost, snapshot.mode, snapshot.remainingSeconds,
+      snapshot.remainingMoves, snapshot.gameEnded, snapshot.timerStartedAt);
   }
 
   private validateSnapshotRecord(record: Record<string, Object>): GameSnapshot | undefined {
-    if (typeof record['won'] !== 'boolean' || typeof record['lost'] !== 'boolean') {
-      return undefined;
-    }
-
     return this.validateSnapshotValues(Number(record['version']), record['cells'], Number(record['score']),
-      Number(record['stepCount']), Number(record['bestScore']), record['won'] === true, record['lost'] === true);
+      Number(record['stepCount']), Number(record['bestScore']), record['won'] === true, record['lost'] === true,
+      sanitizeGameMode(typeof record['mode'] === 'string' ? record['mode'] as string : undefined),
+      Number(record['remainingSeconds']), Number(record['remainingMoves']), record['gameEnded'] === true,
+      Number(record['timerStartedAt']));
   }
 
   private validateSnapshotValues(version: number, cellsSource: Object, score: number, stepCount: number,
-    bestScore: number, won: boolean, lost: boolean): GameSnapshot | undefined {
+    bestScore: number, won: boolean, lost: boolean, mode: GameMode, remainingSeconds: number,
+    remainingMoves: number, gameEnded: boolean, timerStartedAt: number): GameSnapshot | undefined {
     if (!Array.isArray(cellsSource) || cellsSource.length !== 16) {
       return undefined;
     }
@@ -122,27 +130,30 @@ class GameStateStoreImpl {
       cells.push(cellValue);
     }
 
-    const snapshot: GameSnapshot = {
-      version: version,
+    const checkedVersion = Number.isFinite(version) && version > 0 ? version : 1;
+    const safeScore = Number.isFinite(score) && score >= 0 ? score : 0;
+    const safeStepCount = Number.isFinite(stepCount) && stepCount >= 0 ? stepCount : 0;
+    const safeBestScore = Number.isFinite(bestScore) && bestScore >= 0 ? bestScore : 0;
+    const safeRemainingSeconds = Number.isFinite(remainingSeconds) && remainingSeconds >= 0 ?
+      remainingSeconds : TIMED_TOTAL_SECONDS;
+    const safeRemainingMoves = Number.isFinite(remainingMoves) && remainingMoves >= 0 ?
+      remainingMoves : MOVE_LIMIT_TOTAL_MOVES;
+    const safeTimerStartedAt = Number.isFinite(timerStartedAt) && timerStartedAt >= 0 ? timerStartedAt : 0;
+
+    return {
+      version: checkedVersion <= GAME_SNAPSHOT_VERSION ? GAME_SNAPSHOT_VERSION : checkedVersion,
       cells: cells,
-      score: score,
-      stepCount: stepCount,
-      bestScore: bestScore,
+      score: safeScore,
+      stepCount: safeStepCount,
+      bestScore: safeBestScore,
       won: won,
-      lost: lost
+      lost: lost,
+      mode: mode,
+      remainingSeconds: safeRemainingSeconds,
+      remainingMoves: safeRemainingMoves,
+      gameEnded: gameEnded || lost,
+      timerStartedAt: safeTimerStartedAt
     };
-
-    if (snapshot.version !== GAME_SNAPSHOT_VERSION ||
-      !Number.isFinite(snapshot.score) ||
-      !Number.isFinite(snapshot.stepCount) ||
-      !Number.isFinite(snapshot.bestScore) ||
-      snapshot.score < 0 ||
-      snapshot.stepCount < 0 ||
-      snapshot.bestScore < 0) {
-      return undefined;
-    }
-
-    return snapshot;
   }
 
   private cloneSnapshot(snapshot: GameSnapshot): GameSnapshot {
@@ -153,7 +164,12 @@ class GameStateStoreImpl {
       stepCount: snapshot.stepCount,
       bestScore: snapshot.bestScore,
       won: snapshot.won,
-      lost: snapshot.lost
+      lost: snapshot.lost,
+      mode: snapshot.mode,
+      remainingSeconds: snapshot.remainingSeconds,
+      remainingMoves: snapshot.remainingMoves,
+      gameEnded: snapshot.gameEnded,
+      timerStartedAt: snapshot.timerStartedAt
     };
   }
 }

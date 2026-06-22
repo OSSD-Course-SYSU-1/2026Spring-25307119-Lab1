@@ -2,31 +2,31 @@
   "color": [
     {
       "name": "start_window_background",
-      "value": "#FFFFFF"
+      "value": "#F5F2FA"
     },
     {
       "name": "common_gray_01",
-      "value": "#979797"
+      "value": "#7A7485"
     },
     {
       "name": "common_gray_02",
-      "value": "#848484"
+      "value": "#7A7485"
     },
     {
       "name": "common_gray_03",
-      "value": "#666666"
+      "value": "#2B2435"
     },
     {
       "name": "common_gray_bg",
-      "value": "#f3f4f5"
+      "value": "#F5F2FA"
     },
     {
       "name": "common_gray_border",
-      "value": "#e8e7ee"
+      "value": "#E7E0F2"
     },
     {
       "name": "common_main_color",
-      "value": "#FA6D1D"
+      "value": "#6C4CCF"
     },
     {
       "name": "common_green",
@@ -42,7 +42,7 @@
     },
     {
       "name": "black",
-      "value": "#131313"
+      "value": "#2B2435"
     },
     {
       "name": "white",
@@ -50,7 +50,19 @@
     },
     {
       "name": "home_gray",
-      "value": "#EDECF2"
+      "value": "#F5F2FA"
+    },
+    {
+      "name": "theme_primary_dark",
+      "value": "#49318C"
+    },
+    {
+      "name": "theme_card",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "theme_secondary_text",
+      "value": "#7A7485"
     }
 
   ]

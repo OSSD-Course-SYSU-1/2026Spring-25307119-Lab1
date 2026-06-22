@@ -20,6 +20,7 @@ class Tile {
   oldColumn: number;
   markForDeletion: boolean;
   mergedInto: Tile | null;
+  mergedThisTurn: boolean;
   id: number;
 
   constructor(value?: number, row?: number, column?: number) {
@@ -30,6 +31,7 @@ class Tile {
     this.oldColumn = -1;
     this.markForDeletion = false;
     this.mergedInto = null;
+    this.mergedThisTurn = false;
     this.id = NextID++;
   }
 
@@ -136,6 +138,7 @@ class Board {
           let tile2: Tile = currentRow.shift()!;
           tile2.mergedInto = targetTile;
           targetTile.value += tile2.value;
+          targetTile.mergedThisTurn = true;
           this.score += tile1.value + tile2.value;
         }
         resultRow[target] = targetTile;
@@ -246,6 +249,7 @@ class Board {
     this.tiles = this.tiles.filter((tile) => tile.markForDeletion === false);
     this.tiles.forEach((tile) => {
       tile.markForDeletion = true;
+      tile.mergedThisTurn = false;
     });
   }
 
