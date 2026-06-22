@@ -112,9 +112,6 @@ export struct NumberGameComp {
   @State imageHashMap: HashMap<string, Resource> = new HashMap();
 
   private undoSnapshot: GameSnapshot | undefined = undefined;
-  private victoryPromptShown: boolean = false;
-  private lostPromptShown: boolean = false;
-  private settlementPromptShown: boolean = false;
   private roundRecorded: boolean = false;
   private timerId: number = -1;
   private pendingSettlementReason: string = SETTLEMENT_NONE;
@@ -748,9 +745,6 @@ export struct NumberGameComp {
     this.gameEnded = false;
     this.lost = false;
     this.won = false;
-    this.victoryPromptShown = false;
-    this.lostPromptShown = false;
-    this.settlementPromptShown = false;
     this.roundRecorded = false;
     this.pendingSettlementReason = SETTLEMENT_NONE;
     this.achievementQueue = [];
@@ -840,8 +834,6 @@ export struct NumberGameComp {
     const snapshot = this.cloneSnapshot(this.undoSnapshot);
     if (this.restoreSnapshot(snapshot, false)) {
       this.clearUndoSnapshot();
-      this.lostPromptShown = false;
-      this.settlementPromptShown = false;
       this.pendingSettlementReason = SETTLEMENT_NONE;
       this.clearSettlementState();
       this.showMessage('撤销一步', '已恢复到上一步。');
@@ -939,7 +931,6 @@ export struct NumberGameComp {
   showSettlement(reason: string): void {
     this.settlementReason = reason;
     this.settlementVisible = true;
-    this.settlementPromptShown = true;
   }
 
   startTimedTimerIfNeeded(): void {
@@ -1073,7 +1064,6 @@ export struct NumberGameComp {
     this.settlementSteps = 0;
     this.settlementMaxTile = 0;
     this.settlementBestScore = 0;
-    this.settlementPromptShown = false;
     this.pendingSettlementReason = SETTLEMENT_NONE;
   }
 
@@ -1141,9 +1131,6 @@ export struct NumberGameComp {
     this.bestScore = this.statisticsStore.getBestScore(this.modeBestScores, this.currentMode);
     this.won = snapshot.won;
     this.lost = snapshot.lost;
-    this.victoryPromptShown = snapshot.won;
-    this.lostPromptShown = snapshot.lost;
-    this.settlementPromptShown = false;
     this.roundRecorded = snapshot.gameEnded || snapshot.won || snapshot.lost;
     if (clearUndo) {
       this.clearUndoSnapshot();
